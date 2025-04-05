@@ -64,7 +64,8 @@ def execute_sql_query(generated_sql: str, used_config: dict) -> str:
 
 
 def generate_sql_query(prompt, config) -> str:
-    system_prompt = BASE_PROMPT.format(
+    generate_sql_template = env.get_template("base_prompt.jinja2")
+    generate_sql_system_prompt = generate_sql_template.render(
         schema=DB_SCHEMA,
         age=config["insu_age"],
         sex_num=config["sex"],
@@ -76,7 +77,7 @@ def generate_sql_query(prompt, config) -> str:
     response = client.chat.completions.create(
         model="gpt-4-0125-preview",
         messages=[
-            {"role": "system", "content": system_prompt},
+            {"role": "system", "content": generate_sql_system_prompt},
             {"role": "user", "content": prompt},
         ],
         temperature=0,
