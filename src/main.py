@@ -1,19 +1,25 @@
 import openai
+import os
 from dotenv import load_dotenv
-from config import DEFAULT_CONFIG, DB_CONFIG
-from prompts import BASE_PROMPT, EXAMPLE_PROMPT, INTENT_PROMPT
+from config import DEFAULT_CONFIG
 from version01 import response
-from utils import process_query, generate_sql_query, execute_sql_query
+from utils import process_query
+from sql_utils import generate_sql_query, execute_sql_query
+from jinja2 import Environment, FileSystemLoader
 
-load_dotenv()
+
+env = Environment(loader=FileSystemLoader("/Users/hyerim/sessac/rag/src/prompts/"))
+
 client = openai.OpenAI()
+openaai_key = os.environ["OPENAI_API_KEY"]
 
 
 class IntentModule:
-    def __init__(self, user_question: str, PROMPT):
-        self.prompt = PROMPT.format(question=user_question)
+    def __init__(self, user_question: str):
+        self.intent_template = env.get_template("intent_prompt.jinja2")
+        self.intent_system_prompt = self.intent_template.render(question=user_question)
 
-    def classify_response(self):
+    def classify_response(self) -> str:
         response = client.chat.completions.create(
             model="gpt-4-turbo",
             messages=[
@@ -21,7 +27,7 @@ class IntentModule:
                     "role": "system",
                     "content": "너는 GA 보험설계사들이 사용하는 보험전문 챗봇이야.",
                 },
-                {"role": "user", "content": self.prompt},
+                {"role": "user", "content": self.intent_system_prompt},
             ],
         )
         return response.choices[0].message.content
@@ -59,7 +65,7 @@ if __name__ == "__main__":
         "질문을 입력하세요 (종료하려면 'q' 또는 'quit' 입력):\n"
     ).strip()
 
-    classify_intent = IntentModule(user_question, INTENT_PROMPT)
+    classify_intent = IntentModule(user_question)
     compare_module = CompareModule()
     result_intent = classify_intent.classify_response()
 

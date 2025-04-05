@@ -8,6 +8,8 @@ from typing import List, Union
 
 from dotenv import load_dotenv
 
+import langsmith
+
 load_dotenv()
 
 # LangChain 임포트
@@ -24,16 +26,7 @@ LANGCHAIN_ENDPOINT = os.getenv("LANGCHAIN_ENDPOINT", "https://api.smith.langchai
 if LANGCHAIN_API_KEY:
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
     os.environ["LANGCHAIN_PROJECT"] = LANGCHAIN_PROJECT
-
-    # LangSmith 클라이언트 초기화
-    # langsmith_client = Client(api_key=LANGCHAIN_API_KEY, api_url=LANGCHAIN_ENDPOINT)
-    # print("LangSmith 트래킹이 활성화되었습니다.")
-
-    # OpenAI 래핑 설정 (추후 OpenAI 클라이언트 사용 시)
     try:
-        # OpenAI 클래스를 직접 래핑하는 대신 각 인스턴스별로 래핑
-        # from openai import OpenAI
-        # wrapped_openai = wrap_openai(OpenAI)  # 이 방식은 작동하지 않음
         print("OpenAI 래핑은 get_upstage_embedding 메서드에서 개별적으로 수행됨")
     except ImportError:
         print("OpenAI SDK를 가져올 수 없습니다. OpenAI 래핑은 건너뜁니다.")
@@ -78,6 +71,19 @@ class RAGService:
         self.base_path = os.path.join(
             os.path.dirname(os.path.dirname(__file__)), "src/vector_db"
         )
+        self.collection_to_company_mapping = {
+            "DBSonBo_YakMu20250123": "DB손해보험",
+            "Samsung_YakMu2404103NapHae20250113": "삼성화재",
+            "HaNa_YakMuHaGaengPyo20250101": "하나손해보험",
+            "HanWha_YakHan20250201": "한화손해보험",
+            "Heung_YakMu250220250205": "흥국화재",
+            "HyunDai_YakMuSeH1Il2Nap20250213": "현대해상",
+            "KB_YakKSeHaeMu250120250214": "KB손해보험",
+            "LotteSonBo_YakMuLDeo25011220250101": "롯데손해보험",
+            "MGSonBo_YakMuWon2404Se20250101": "MG손해보험",
+            "Meritz_YakMu220250113": "메리츠화재",
+            "NH_YakMuN5250120250101": "NH농협손해보험",
+        }
 
     def load_collection(self, collection_name):
         try:
@@ -93,13 +99,63 @@ class RAGService:
             # 하드코딩된 매핑 대신 동적으로 컬렉션 이름 사용
             # 예외 처리: 알려진 별칭이 있는 경우 실제 디렉토리 이름으로 매핑
             collection_mapping = {
-                # 이 문제의 원인인 이전 이름 매핑을 완전히 제거
+                # DB손해보험 관련 매핑
                 "db손해보험": "DBSonBo_YakMu20250123",
                 "DB손해보험": "DBSonBo_YakMu20250123",
                 "db손보": "DBSonBo_YakMu20250123",
+                "디비손해보험": "DBSonBo_YakMu20250123",
+                "디비손보": "DBSonBo_YakMu20250123",
+                "디비": "DBSonBo_YakMu20250123",
+                "DBSonbo_Yakwan20250123": "DBSonBo_YakMu20250123",
+                # 삼성화재 관련 매핑
                 "삼성화재": "Samsung_YakMu2404103NapHae20250113",
                 "삼성": "Samsung_YakMu2404103NapHae20250113",
-                "DBSonbo_Yakwan20250123": "DBSonBo_YakMu20250123",
+                "samsung": "Samsung_YakMu2404103NapHae20250113",
+                # 하나손해보험 관련 매핑
+                "하나손해보험": "HaNa_YakMuHaGaengPyo20250101",
+                "하나손보": "HaNa_YakMuHaGaengPyo20250101",
+                "하나": "HaNa_YakMuHaGaengPyo20250101",
+                "hana": "HaNa_YakMuHaGaengPyo20250101",
+                # 한화손해보험 관련 매핑
+                "한화손해보험": "HanWha_YakHan20250201",
+                "한화손보": "HanWha_YakHan20250201",
+                "한화": "HanWha_YakHan20250201",
+                "hanwha": "HanWha_YakHan20250201",
+                # 흥국화재 관련 매핑
+                "흥국화재": "Heung_YakMu250220250205",
+                "흥국": "Heung_YakMu250220250205",
+                "heung": "Heung_YakMu250220250205",
+                # 현대해상 관련 매핑
+                "현대해상": "HyunDai_YakMuSeH1Il2Nap20250213",
+                "현대": "HyunDai_YakMuSeH1Il2Nap20250213",
+                "hyundai": "HyunDai_YakMuSeH1Il2Nap20250213",
+                # KB손해보험 관련 매핑
+                "KB손해보험": "KB_YakKSeHaeMu250120250214",
+                "KB손보": "KB_YakKSeHaeMu250120250214",
+                "KB": "KB_YakKSeHaeMu250120250214",
+                "케이비": "KB_YakKSeHaeMu250120250214",
+                # 롯데손해보험 관련 매핑
+                "롯데손해보험": "LotteSonBo_YakMuLDeo25011220250101",
+                "롯데손보": "LotteSonBo_YakMuLDeo25011220250101",
+                "롯데": "LotteSonBo_YakMuLDeo25011220250101",
+                "lotte": "LotteSonBo_YakMuLDeo25011220250101",
+                # MG손해보험 관련 매핑
+                "MG손해보험": "MGSonBo_YakMuWon2404Se20250101",
+                "MG손보": "MGSonBo_YakMuWon2404Se20250101",
+                "MG": "MGSonBo_YakMuWon2404Se20250101",
+                "엠지": "MGSonBo_YakMuWon2404Se20250101",
+                # 메리츠화재 관련 매핑
+                "메리츠화재": "Meritz_YakMu220250113",
+                "메리츠": "Meritz_YakMu220250113",
+                "meritz": "Meritz_YakMu220250113",
+                # NH농협손해보험 관련 매핑
+                "NH농협손해보험": "NH_YakMuN5250120250101",
+                "NH손해보험": "NH_YakMuN5250120250101",
+                "농협손해보험": "NH_YakMuN5250120250101",
+                "NH손보": "NH_YakMuN5250120250101",
+                "농협손보": "NH_YakMuN5250120250101",
+                "NH": "NH_YakMuN5250120250101",
+                "농협": "NH_YakMuN5250120250101",
             }
 
             # 로깅을 위한 원래 이름 저장
@@ -669,9 +725,12 @@ class RAGService:
         company_results = {}
         for result in search_results:
             collection_name = result.get("collection", "")
-            if collection_name not in company_results:
-                company_results[collection_name] = []
-            company_results[collection_name].append(result)
+            company_name = self.collection_to_company_mapping.get(
+                collection_name, collection_name
+            )
+            if company_name not in company_results:
+                company_results[company_name] = []
+            company_results[company_name].append(result)
 
         print(f"검색된 보험사 수: {len(company_results)}")
         for company, results in company_results.items():
@@ -687,11 +746,10 @@ class RAGService:
             print(f"\n단일 보험사 컨텍스트 생성 중...")
 
         for company, results in company_results.items():
-            friendly_name = get_friendly_name(company)
             company_context = ""
 
             if multiple_companies:
-                company_context += f"\n\n## {friendly_name} 정보:\n"
+                company_context += f"\n\n## {company} 정보:\n"
 
             for result in results:
                 text = result.get("metadata", {}).get("text", "")
@@ -704,7 +762,7 @@ class RAGService:
                 if len(company_context) > 150
                 else company_context
             )
-            print(f"{friendly_name} 컨텍스트: {text_preview}")
+            print(f"{company} 컨텍스트: {text_preview}")
 
         if not context:
             return "관련 정보를 찾을 수 없습니다. 더 구체적인 질문을 해주시거나, 다른 키워드를 사용해보세요."
@@ -739,85 +797,37 @@ class RAGService:
         print(f"시스템 메시지: {system_message}")
         print(f"프롬프트 길이: {len(prompt)} 자")
 
-        # LangChain의 ChatOpenAI 모델 초기화 - 최신 버전 호환성 반영
-        try:
-            # 최신 LangChain API와 호환되도록 수정
-            chat = ChatOpenAI(
-                api_key=openai_api_key,
-                temperature=0.7,
-                max_tokens=2000,
-                model="gpt-4o-mini",
-            )
+        # 최신 LangChain API와 호환되도록 수정
+        chat = ChatOpenAI(
+            api_key=openai_api_key,
+            temperature=0.7,
+            max_tokens=2000,
+            model="gpt-4o-mini",
+        )
 
-            # 메타데이터 기록을 위한 정보
-            metadata = {
-                "query": query,
-                "is_comparison": is_comparison,
-                "multiple_companies": multiple_companies,
-                "company_count": len(company_results),
-                "companies": list(company_results.keys()),
-                "context_length": len(context),
-            }
+        messages = [
+            SystemMessage(content=system_message),
+            HumanMessage(content=prompt),
+        ]
 
-            messages = [
-                SystemMessage(content=system_message),
-                HumanMessage(content=prompt),
-            ]
+        print(f"LLM 호출 중...")
 
-            print(f"LLM 호출 중...")
+        response = chat.invoke(messages)
+        answer = response.content
+        print(f"LLM 응답 생성 완료 (길이: {len(answer)} 자)")
 
-            # LangSmith 런 생성 및 트래킹 - 최신 API로 업데이트
-            try:
-                with langsmith.trace(
-                    name="generate_insurance_answer",
-                    project_name=LANGCHAIN_PROJECT,
-                    tags=["insupanda", "llm_response"],
-                    metadata=metadata,
-                ) as run:
-                    response = chat.invoke(messages)
-                    answer = response.content
-                    print(f"LLM 응답 생성 완료 (길이: {len(answer)} 자)")
-                    if run:
-                        run.add_metadata({"status": "응답 성공"})
+        print(f"-------- 답변 생성 완료 --------\n")
+        print("answer", answer)
 
-                    print(f"-------- 답변 생성 완료 --------\n")
-                    print("answer", answer)
-                    return answer
-            except Exception as e:
-                print(f"LangSmith 트래킹 오류: {e}")
-                # LangSmith 오류가 있어도 LLM 응답은 계속 진행
-                response = chat.invoke(messages)
-                answer = response.content
-                print(f"LLM 응답 생성 완료 (길이: {len(answer)} 자)")
-                print(f"-------- 답변 생성 완료 --------\n")
-                print(answer)
-                return answer
+        # 답변에서 컬렉션 이름을 실제 보험사 이름으로 변환
+        for (
+            collection_name,
+            company_name,
+        ) in self.collection_to_company_mapping.items():
+            if collection_name in answer:
+                answer = answer.replace(collection_name, company_name)
 
-        except Exception as e:
-            print(f"LLM 호출 오류: {e}")
-            print(f"직접 OpenAI API 호출 시도 중...")
-            # 최후의 수단으로 직접 OpenAI API 호출 시도
-            try:
-                from openai import OpenAI
-
-                client = OpenAI(api_key=openai_api_key)
-                response = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
-                        {"role": "system", "content": system_message},
-                        {"role": "user", "content": prompt},
-                    ],
-                    temperature=0.7,
-                    max_tokens=2000,
-                )
-                answer = response.choices[0].message.content
-                print(f"OpenAI API 직접 호출 성공 (길이: {len(answer)} 자)")
-                print(f"-------- 답변 생성 완료 --------\n")
-                return answer
-            except Exception as fallback_error:
-                print(f"직접 OpenAI API 호출 오류: {fallback_error}")
-                print(f"-------- 답변 생성 실패 --------\n")
-                return f"답변 생성 중 오류가 발생했습니다. 관리자에게 문의해주세요. 오류: {str(e)}"
+        return answer
 
     def find_matching_collections(self, question, available_collections):
         """
@@ -846,6 +856,23 @@ class RAGService:
                 "db",
                 "디비손해보험",
                 "디비",
+            ],
+            "하나손해보험": ["하나손해보험", "하나손보", "하나", "hana"],
+            "한화손해보험": ["한화손해보험", "한화손보", "한화", "hanwha"],
+            "흥국화재": ["흥국화재", "흥국", "heung", "흥국생명"],
+            "현대해상": ["현대해상", "현대", "hyundai"],
+            "KB손해보험": ["KB손해보험", "KB손보", "KB", "케이비"],
+            "롯데손해보험": ["롯데손해보험", "롯데손보", "롯데", "lotte"],
+            "MG손해보험": ["MG손해보험", "MG손보", "MG", "엠지"],
+            "메리츠화재": ["메리츠화재", "메리츠", "meritz"],
+            "NH농협손해보험": [
+                "NH농협손해보험",
+                "NH손해보험",
+                "농협손해보험",
+                "NH손보",
+                "농협손보",
+                "NH",
+                "농협",
             ],
         }
 
@@ -933,6 +960,96 @@ class RAGService:
                     is_relevant = True
                     print(f"DB손해보험 컬렉션 매칭: {collection}")
 
+                # 하나손해보험 컬렉션 매칭
+                elif (
+                    "hana" in collection.lower()
+                    or "하나" in collection
+                    or "ha" in collection.lower()
+                ):
+                    matched_collections.append(collection)
+                    is_relevant = True
+                    print(f"하나손해보험 컬렉션 매칭: {collection}")
+
+                # 한화손해보험 컬렉션 매칭
+                elif (
+                    "hanwha" in collection.lower()
+                    or "한화" in collection
+                    or "hw" in collection.lower()
+                ):
+                    matched_collections.append(collection)
+                    is_relevant = True
+                    print(f"한화손해보험 컬렉션 매칭: {collection}")
+
+                # 흥국화재 컬렉션 매칭
+                elif (
+                    "heung" in collection.lower()
+                    or "흥국" in collection
+                    or "hg" in collection.lower()
+                ):
+                    matched_collections.append(collection)
+                    is_relevant = True
+                    print(f"흥국화재 컬렉션 매칭: {collection}")
+
+                # 현대해상 컬렉션 매칭
+                elif (
+                    "hyundai" in collection.lower()
+                    or "현대" in collection
+                    or "hd" in collection.lower()
+                ):
+                    matched_collections.append(collection)
+                    is_relevant = True
+                    print(f"현대해상 컬렉션 매칭: {collection}")
+
+                # KB손해보험 컬렉션 매칭
+                elif (
+                    "kb" in collection.lower()
+                    or "KB" in collection
+                    or "케이비" in collection
+                ):
+                    matched_collections.append(collection)
+                    is_relevant = True
+                    print(f"KB손해보험 컬렉션 매칭: {collection}")
+
+                # 롯데손해보험 컬렉션 매칭
+                elif (
+                    "lotte" in collection.lower()
+                    or "롯데" in collection
+                    or "lt" in collection.lower()
+                ):
+                    matched_collections.append(collection)
+                    is_relevant = True
+                    print(f"롯데손해보험 컬렉션 매칭: {collection}")
+
+                # MG손해보험 컬렉션 매칭
+                elif (
+                    "mg" in collection.lower()
+                    or "MG" in collection
+                    or "엠지" in collection
+                ):
+                    matched_collections.append(collection)
+                    is_relevant = True
+                    print(f"MG손해보험 컬렉션 매칭: {collection}")
+
+                # 메리츠화재 컬렉션 매칭
+                elif (
+                    "meritz" in collection.lower()
+                    or "메리츠" in collection
+                    or "mz" in collection.lower()
+                ):
+                    matched_collections.append(collection)
+                    is_relevant = True
+                    print(f"메리츠화재 컬렉션 매칭: {collection}")
+
+                # NH농협손해보험 컬렉션 매칭
+                elif (
+                    "nh" in collection.lower()
+                    or "NH" in collection
+                    or "농협" in collection
+                ):
+                    matched_collections.append(collection)
+                    is_relevant = True
+                    print(f"NH농협손해보험 컬렉션 매칭: {collection}")
+
                 if not is_relevant and len(mentioned_companies) == 0:
                     # 특정 보험사가 언급되지 않은 경우 모든 컬렉션 추가
                     matched_collections.append(collection)
@@ -953,6 +1070,78 @@ class RAGService:
                 ):
                     matched_collections.append(collection)
                     print(f"DB손해보험 컬렉션 매칭: {collection}")
+
+                elif "하나손해보험" in mentioned_companies and (
+                    "hana" in collection.lower()
+                    or "하나" in collection
+                    or "ha" in collection.lower()
+                ):
+                    matched_collections.append(collection)
+                    print(f"하나손해보험 컬렉션 매칭: {collection}")
+
+                elif "한화손해보험" in mentioned_companies and (
+                    "hanwha" in collection.lower()
+                    or "한화" in collection
+                    or "hw" in collection.lower()
+                ):
+                    matched_collections.append(collection)
+                    print(f"한화손해보험 컬렉션 매칭: {collection}")
+
+                elif "흥국화재" in mentioned_companies and (
+                    "heung" in collection.lower()
+                    or "흥국" in collection
+                    or "hg" in collection.lower()
+                ):
+                    matched_collections.append(collection)
+                    print(f"흥국화재 컬렉션 매칭: {collection}")
+
+                elif "현대해상" in mentioned_companies and (
+                    "hyundai" in collection.lower()
+                    or "현대" in collection
+                    or "hd" in collection.lower()
+                ):
+                    matched_collections.append(collection)
+                    print(f"현대해상 컬렉션 매칭: {collection}")
+
+                elif "KB손해보험" in mentioned_companies and (
+                    "kb" in collection.lower()
+                    or "KB" in collection
+                    or "케이비" in collection
+                ):
+                    matched_collections.append(collection)
+                    print(f"KB손해보험 컬렉션 매칭: {collection}")
+
+                elif "롯데손해보험" in mentioned_companies and (
+                    "lotte" in collection.lower()
+                    or "롯데" in collection
+                    or "lt" in collection.lower()
+                ):
+                    matched_collections.append(collection)
+                    print(f"롯데손해보험 컬렉션 매칭: {collection}")
+
+                elif "MG손해보험" in mentioned_companies and (
+                    "mg" in collection.lower()
+                    or "MG" in collection
+                    or "엠지" in collection
+                ):
+                    matched_collections.append(collection)
+                    print(f"MG손해보험 컬렉션 매칭: {collection}")
+
+                elif "메리츠화재" in mentioned_companies and (
+                    "meritz" in collection.lower()
+                    or "메리츠" in collection
+                    or "mz" in collection.lower()
+                ):
+                    matched_collections.append(collection)
+                    print(f"메리츠화재 컬렉션 매칭: {collection}")
+
+                elif "NH농협손해보험" in mentioned_companies and (
+                    "nh" in collection.lower()
+                    or "NH" in collection
+                    or "농협" in collection
+                ):
+                    matched_collections.append(collection)
+                    print(f"NH농협손해보험 컬렉션 매칭: {collection}")
 
                 # 보험사가 언급되지 않은 경우 모든 컬렉션 추가
                 elif len(mentioned_companies) == 0:

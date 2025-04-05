@@ -2,14 +2,14 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import SystemMessage
-from typing import List, Dict
+from typing import Dict
 
 
 def get_friendly_name(collection_name: str) -> str:
     return collection_name
 
 
-def generate_answer(self, query: str, search_results: List[Dict], openai_api_key: str):
+def generate_answer(self, query: str, search_results: list[Dict], openai_api_key: str):
     if not search_results:
         return "검색 결과가 없습니다. 다른 질문을 시도해보세요."
     if not openai_api_key:
