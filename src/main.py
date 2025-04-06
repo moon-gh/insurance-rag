@@ -1,6 +1,5 @@
 import openai
 import os
-from dotenv import load_dotenv
 from config import DEFAULT_CONFIG
 from version01 import response
 from utils import process_query
