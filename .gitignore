@@ -2,7 +2,8 @@
 6_json_converter.py
 classify_intent.py
 query_results/*
-src/vector_db/*
+src/insu_data/*
+src/ver01_copy.py
 files/*
 .env
 

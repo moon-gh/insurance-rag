@@ -69,7 +69,7 @@ class RAGService:
         self.collections = []
         self.cached_embeddings = {}
         self.base_path = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)), "src/vector_db"
+            os.path.dirname(os.path.dirname(__file__)), "src/insu_data"
         )
         self.collection_to_company_mapping = {
             "DBSonBo_YakMu20250123": "DB손해보험",

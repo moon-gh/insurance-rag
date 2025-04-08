@@ -1,6 +1,7 @@
-from langchain_upstage import UpstageEmbeddings
-import numpy as np
 import os
+import numpy as np
+
+from langchain_upstage import UpstageEmbeddings
 
 
 class UpstageEmbedding(UpstageEmbeddings):
@@ -17,7 +18,6 @@ class UpstageEmbedding(UpstageEmbeddings):
         )
 
     def get_upstage_embedding(self, text: str) -> float:
-
         if text in self.cached_embeddings:
             return self.cached_embeddings[text]
 
