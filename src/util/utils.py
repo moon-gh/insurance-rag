@@ -1,4 +1,7 @@
 import re
+import copy
+
+from config.settings import PersonConfig, Sex
 
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -7,40 +10,39 @@ load_dotenv()
 openai_client = OpenAI()
 
 
-def process_query(prompt: str, config):
-    # 현재 사용되는 설정값 저장
-    current_config = config.copy()
+def process_query(prompt: str, config: PersonConfig):
+    # dataclass 인스턴스 복사 (얕은 복사)
+    current_config = copy.copy(config)
 
     # 나이 추출 (숫자 + "세" 패턴)
     age_match = re.search(r"(\d+)세", prompt)
     if age_match:
-        current_config["insu_age"] = int(age_match.group(1))
+        current_config.insu_age = int(age_match.group(1))
 
     # 성별 추출
     if "남성" in prompt or "남자" in prompt:
-        current_config["sex"] = 1
+        current_config.sex = Sex.MALE
     elif "여성" in prompt or "여자" in prompt:
-        current_config["sex"] = 0
+        current_config.sex = Sex.FEMALE
 
     # 상품유형 추출
     if "무해지" in prompt:
-        current_config["product_type"] = "nr"
+        current_config.product_type = "nr"
     elif "해지환급" in prompt:
-        current_config["product_type"] = "r"
+        current_config.product_type = "r"
 
     # 보험기간 추출
     period_match = re.search(r"(\d+)년[/\s](\d+)세", prompt)
     if period_match:
         years = period_match.group(1)
         age = period_match.group(2)
-        current_config["expiry_year"] = f"{years}y_{age}"
+        current_config.expiry_year = f"{years}y_{age}"
 
-    # 보험사 추출 (옵션)
-    if "삼성" in prompt:
-        current_config["company_id"] = "01"
-    elif "한화" in prompt:
-        current_config["company_id"] = "02"
-    # 다른 보험사들에 대한 매핑도 추가 가능
+    # 보험사 추출 (옵션, 단, PersonConfig에 company_id 속성이 정의되어 있어야 함)
+    # if "삼성" in prompt:
+    #     current_config.company_id = "01"
+    # elif "한화" in prompt:
+    #     current_config.company_id = "02"
 
     return prompt, current_config
 
