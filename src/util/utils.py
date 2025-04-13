@@ -1,7 +1,7 @@
 import re
 import copy
 
-from config.settings import PersonConfig, Sex
+from config.settings import Settings, Sex
 
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -10,7 +10,7 @@ load_dotenv()
 openai_client = OpenAI()
 
 
-def process_query(prompt: str, config: PersonConfig):
+def process_query(prompt: str, config: Settings):
     # dataclass 인스턴스 복사 (얕은 복사)
     current_config = copy.copy(config)
 
@@ -38,7 +38,7 @@ def process_query(prompt: str, config: PersonConfig):
         age = period_match.group(2)
         current_config.expiry_year = f"{years}y_{age}"
 
-    # 보험사 추출 (옵션, 단, PersonConfig에 company_id 속성이 정의되어 있어야 함)
+    # 보험사 추출 (옵션, 단, Settings에 company_id 속성이 정의되어 있어야 함)
     # if "삼성" in prompt:
     #     current_config.company_id = "01"
     # elif "한화" in prompt:

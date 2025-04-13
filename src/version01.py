@@ -44,7 +44,7 @@ class SearchQuery(BaseModel):
 
     class Config:
         # 추가 유효성 검사와 예제 값 설정
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "query": "삼성화재 암보험에 대해 알려줘",
                 "collections": ["Samsung_YakMu2404103NapHae20250113"],

@@ -1,14 +1,14 @@
 from dataclasses import asdict
 
-from config.settings import DB_CONFIG, PersonConfig
-from DB.schema import DB_SCHEMA
+from config.settings import Settings, Sex, settings
+from db.schema import DB_SCHEMA
 
 import simplejson as json
 import mysql.connector
 from openai import OpenAI
 from jinja2 import Environment, FileSystemLoader
 
-openai_client = OpenAI()
+openai_client = OpenAI()  # TODO: main 주입받도록 변경하기
 
 
 class TemplateManager:
@@ -25,9 +25,14 @@ class TemplateManager:
 
 
 class DatabaseClient:
-    def __init__(self, db_config: dict = DB_CONFIG):
-        # DB 연결을 객체 초기화 시 생성하여 재사용
-        self.conn = mysql.connector.connect(**db_config)
+    def __init__(self, settings: Settings = settings):
+        self.conn = mysql.connector.connect(
+            host=settings.db_host,
+            port=settings.db_port,
+            user=settings.db_user,
+            password=settings.db_password,
+            database=settings.db_database,
+        )
 
     def execute_query(self, query: str) -> list:
         with self.conn.cursor(dictionary=True) as cursor:
@@ -98,13 +103,13 @@ class SQLGenerator:
         )
         return response
 
-    def generate(self, prompt: str, config: PersonConfig) -> str:
+    def generate(self, prompt: str, config: Settings) -> str:
         self.generate_sql_system_prompt = self.template_manager.render(
             "base_prompt.jinja2",
             schema=DB_SCHEMA,
             age=config.insu_age,
             sex_num=config.sex,
-            sex="남자" if config.sex == 1 else "여자",
+            sex="남자" if config.sex == Sex.MALE else "여자",
             product_type=config.product_type,
             expiry_year=config.expiry_year,
         )
@@ -119,14 +124,14 @@ class QueryExecutor:
         self.db_client = DatabaseClient()
         self.json_converter = JSONConverter(openai_client, template_manager)
 
-    def execute_sql_query(self, generated_sql: str, used_config: PersonConfig) -> str:
+    def execute_sql_query(self, generated_sql: str, used_config: Settings) -> str:
         results = self.db_client.execute_query(generated_sql)
         print("\n[검색 결과]")
         if results:
             print(f"전체 결과 수: {len(results)}개")
             # 검색 결과와 설정값을 함께 딕셔너리로 구성
             temp_data = {
-                "설정값": asdict(used_config),
+                "설정값": used_config.model_dump(),
                 "쿼리": generated_sql,
                 "결과": results,  # 각 행은 이미 딕셔너리 형태임
             }

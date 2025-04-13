@@ -1,6 +1,6 @@
 from util.utils import process_query
-from config.settings import DEFAULT_CONFIG, PersonConfig
-from DB.sql_utils import (
+from config.settings import Settings, settings
+from db.sql_utils import (
     TemplateManager,
     SQLGenerator,
     QueryExecutor,
@@ -14,14 +14,14 @@ class CompareModule:
         self,
         openai_client: OpenAI,
         template_manager: TemplateManager,
-        config: PersonConfig = DEFAULT_CONFIG,
+        config: Settings = settings,
     ):
         self.config = config
         self.template_manager = template_manager
         self.sql_generator = SQLGenerator(self.template_manager)
         self.execute_query = QueryExecutor(openai_client, self.template_manager)
 
-    def print_settings(self, config: PersonConfig) -> None:
+    def print_settings(self, config: Settings) -> None:
         gender = "남자" if config.sex == 1 else "여자"
         product_type = "무해지형" if config.product_type == "nr" else "해지환급형"
         print("\n=== 실행 결과 ===")

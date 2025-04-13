@@ -1,9 +1,8 @@
 from pathlib import Path
-from enum import IntEnum
-from dataclasses import dataclass
+from enum import IntEnum, StrEnum
+from pydantic_settings import BaseSettings
 
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
-# print(f"{PROJECT_ROOT=}")
 
 
 class Sex(IntEnum):
@@ -11,47 +10,25 @@ class Sex(IntEnum):
     MALE = 1  # 남자
 
 
-@dataclass
-class PersonConfig:
-    custom_name: str
-    insu_age: int
-    sex: Sex
-    product_type: str
-    expiry_year: str
-    expiry: int
-    duration: int
+class ProductType(StrEnum):
+    NON_REFUND = "nr"  # 무해지환급형
+    REFUND = "r"  # 해지환급형
 
 
-# @dataclass
-# class DBConfig:
-#     host: str
-#     user: str
-#     password: str
-#     database: str
+class Settings(BaseSettings):
+    custom_name: str = "홍길동"
+    insu_age: int = 25
+    sex: Sex = Sex.MALE
+    product_type: ProductType = ProductType.NON_REFUND
+    expiry_year: str = "20y_100"
+    expiry: int = 20
+    duration: int = 100
+
+    db_host: str = "localhost"
+    db_port: str = "3306"
+    db_user: str = "root"
+    db_password: str = "12345678"  # TODO: env로 빼기
+    db_database: str = "insu"
 
 
-# # 데이터베이스 연결 설정
-# DB_CONFIG = DBConfig(
-#     host="localhost",
-#     user="root",
-#     password="12345678",
-#     database="insu",
-# )
-
-DB_CONFIG = {
-    "host": "localhost",
-    "user": "root",
-    "password": "12345678",
-    "database": "insu",
-}
-
-# 기본 설정값 추가
-DEFAULT_CONFIG = PersonConfig(
-    custom_name="홍길동",
-    insu_age=25,
-    sex=Sex.MALE,
-    product_type="nr",  # nr: 무해지형, r: 해지환급형
-    expiry_year="20y_100",
-    expiry=20,
-    duration=100,
-)
+settings = Settings()

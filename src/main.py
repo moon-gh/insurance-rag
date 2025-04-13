@@ -2,10 +2,9 @@ import os
 from pathlib import Path
 
 from config.settings import PROJECT_ROOT
-from util.utils import process_query
 from modules.intent import IntentModule
 from modules.compare import CompareModule
-from DB.sql_utils import TemplateManager
+from db.sql_utils import TemplateManager
 
 from openai import OpenAI
 from version01 import response
@@ -13,8 +12,10 @@ from version01 import response
 # TODO: isort setting precommit setting
 
 template_manager = TemplateManager(templates_dir=Path(str(f"{PROJECT_ROOT}/prompts")))
+# TODO: main안에 넣어주기
 
-openaai_key = os.environ["OPENAI_API_KEY"]
+openai_key = os.environ["OPENAI_API_KEY"]
+# TODO: settings로 빼기
 
 
 if __name__ == "__main__":
@@ -24,7 +25,7 @@ if __name__ == "__main__":
         "질문을 입력하세요 (종료하려면 'q' 또는 'quit' 입력):\n"
     ).strip()
 
-    openai_client = OpenAI()
+    openai_client = OpenAI()  # TODO: token 정보 넣어줘야 한다.
     classify_intent = IntentModule(openai_client, user_question, template_manager)
     compare_module = CompareModule(openai_client, template_manager)
     result_intent = classify_intent.classify_response()

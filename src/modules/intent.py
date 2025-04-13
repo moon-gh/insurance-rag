@@ -1,4 +1,4 @@
-from DB.sql_utils import TemplateManager
+from db.sql_utils import TemplateManager
 
 from openai import OpenAI
 
