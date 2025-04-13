@@ -1,9 +1,4 @@
-5_sql_query.py
-6_json_converter.py
-classify_intent.py
-query_results/*
 src/insu_data/*
-src/ver01_copy.py
 files/*
 .env
 
