@@ -1,18 +1,10 @@
 from pathlib import Path
-from enum import IntEnum, StrEnum
+
+from types.enum import Sex, ProductType
+
 from pydantic_settings import BaseSettings
 
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
-
-
-class Sex(IntEnum):
-    FEMALE = 2  # 여자
-    MALE = 1  # 남자
-
-
-class ProductType(StrEnum):
-    NON_REFUND = "nr"  # 무해지환급형
-    REFUND = "r"  # 해지환급형
 
 
 class Settings(BaseSettings):

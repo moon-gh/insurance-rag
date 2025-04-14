@@ -38,12 +38,6 @@ def process_query(prompt: str, config: Settings):
         age = period_match.group(2)
         current_config.expiry_year = f"{years}y_{age}"
 
-    # 보험사 추출 (옵션, 단, Settings에 company_id 속성이 정의되어 있어야 함)
-    # if "삼성" in prompt:
-    #     current_config.company_id = "01"
-    # elif "한화" in prompt:
-    #     current_config.company_id = "02"
-
     return prompt, current_config
 
 
@@ -52,9 +46,9 @@ def find_matching_collections(question, available_collections):
     사용자 질문에서 보험사 관련 키워드를 검출하여 일치하는 컬렉션 이름 목록 반환
     비교 질문인 경우 관련된 모든 보험사 컬렉션 반환
     """
-    print(f"\n-------- 컬렉션 매칭 시작 --------")
-    print(f"질문: '{question}'")
-    print(f"사용 가능한 컬렉션: {available_collections}")
+    # print(f"\n-------- 컬렉션 매칭 시작 --------")
+    # print(f"질문: '{question}'")
+    # print(f"사용 가능한 컬렉션: {available_collections}")
 
     if not question or not available_collections:
         print(f"질문이 비어있거나 사용 가능한 컬렉션이 없음")
@@ -124,7 +118,7 @@ def find_matching_collections(question, available_collections):
     for company, keywords in insurance_company_keywords.items():
         if any(keyword in normalized_question for keyword in keywords):
             mentioned_companies.append(company)
-            print(f"보험사 키워드 감지: {company}")
+            # print(f"보험사 키워드 감지: {company}")
 
     # 비교 요청 감지
     is_comparison_request = any(
@@ -134,7 +128,7 @@ def find_matching_collections(question, available_collections):
         detected_keywords = [
             keyword for keyword in comparison_keywords if keyword in normalized_question
         ]
-        print(f"비교 키워드 감지: {detected_keywords}")
+        # print(f"비교 키워드 감지: {detected_keywords}")
 
     # 보험 종류 키워드 감지
     detected_insurance_types = [
@@ -153,7 +147,7 @@ def find_matching_collections(question, available_collections):
         or is_comparison_request
         or "암" in detected_insurance_types
     ):
-        print(f"다중 보험사 비교 또는 암 관련 질문 감지됨")
+        # print(f"다중 보험사 비교 또는 암 관련 질문 감지됨")
         # 모든 보험사 컬렉션 추가
         for collection in available_collections:
             is_relevant = False

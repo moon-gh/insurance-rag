@@ -1,7 +1,8 @@
 from dataclasses import asdict
 
-from config.settings import Settings, Sex, settings
+from config.settings import Settings, settings
 from db.schema import DB_SCHEMA
+from types.enum import Sex
 
 import simplejson as json
 import mysql.connector
