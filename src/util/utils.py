@@ -1,7 +1,8 @@
 import re
 import copy
 
-from config.settings import Settings, Sex
+from config.settings import Settings
+from options.enums import Sex
 
 from openai import OpenAI
 from dotenv import load_dotenv

@@ -3,7 +3,6 @@ import json
 import faiss
 from pathlib import Path
 
-from vectorstore import load_local
 from langchain.embeddings.base import Embeddings
 
 
@@ -61,16 +60,6 @@ class CollectionLoader:
                 metadata[str(i)] = item
         else:
             metadata = metadata_raw
-
-        sample_keys = list(metadata.keys())[:5]
-        if sample_keys:
-            key_types = [type(k) for k in sample_keys]
-
-            # 첫 번째 메타데이터 항목 내용 확인
-            first_item = metadata[sample_keys[0]]
-            print(
-                f"메타데이터 첫 항목: {first_item.keys() if isinstance(first_item, dict) else 'Not a dict'}"
-            )
 
         return index, metadata
 

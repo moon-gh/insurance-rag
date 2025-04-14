@@ -35,4 +35,4 @@ if __name__ == "__main__":
         print(compare_module.get_search_result(user_question))
     else:
         print("그 외 약관")
-        response(user_question)
+        # response(user_question)

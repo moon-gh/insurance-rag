@@ -2,7 +2,7 @@ from enum import IntEnum, StrEnum
 
 
 class Sex(IntEnum):
-    FEMALE = 2  # 여자
+    FEMALE = 0  # 여자
     MALE = 1  # 남자
 
 

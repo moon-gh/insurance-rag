@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from types.enum import Sex, ProductType
+from options.enums import Sex, ProductType
 
 from pydantic_settings import BaseSettings
 
