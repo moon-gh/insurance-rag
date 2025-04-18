@@ -187,4 +187,4 @@ class CollectionLoader:
             {"name": collection_name, "index": index, "metadata": metadata}
         )
 
-        return True
+        return self.collections

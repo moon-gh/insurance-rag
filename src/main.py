@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     if result_intent == "비교설계 질문":
         print(result_intent)
-        print(compare_module.get_search_result(user_question))
+        # print(compare_module.get_search_result(user_question))
     else:
         print("그 외 약관")
-        # response(user_question)
+        response(user_question)

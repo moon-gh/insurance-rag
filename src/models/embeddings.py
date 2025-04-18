@@ -4,7 +4,7 @@ import numpy as np
 from langchain_upstage import UpstageEmbeddings
 
 
-class UpstageEmbedding(UpstageEmbeddings):
+class UpstageEmbedding:
     def __init__(self, upstage_api_key=None):
         self.api_key = upstage_api_key or os.getenv("UPSTAGE_API_KEY")
         if not self.api_key or len(self.api_key) < 10:
