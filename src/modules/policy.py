@@ -19,11 +19,13 @@ class PolicyModule:
     ):
         self.openai_client = openai_client
         self.template_manager = template_manager
-        self.vector_path = "insu_data"
-        self.collections = []
+        self.vector_path = "insu_data"  # TODO: setteng으로 빼기
+        self.collections: list[str] = []  # TODO: 다시 확인
         self.loader = CollectionLoader(self.vector_path, UpstageEmbedding)
+        # TODO: 외부에서 주입받아야 된다.
 
-    def respond_policy_question(self, user_question):
+    def respond_policy_question(self, user_question: str) -> str:
+        # TODO: 덩어리가 너무 크다. 하는일이 너무 많음. (시스템 디자인)
         available_collections = [
             d
             for d in os.listdir(self.loader.base_path)
@@ -38,10 +40,11 @@ class PolicyModule:
         print(f"사용할 컬렉션: {use_collections}")
 
         for collection_name in use_collections:
-            total_collections = self.loader.load_collection(collection_name)
+            self.loader.load_collection(collection_name)
+        # TODO: 변수 replace되고 있다. 확인
 
         search_results = search(
-            user_question, total_collections, use_collections, top_k=2
+            user_question, self.loader.collections, use_collections, top_k=2
         )
 
         answer = generate_answer(user_question, search_results, settings.openai_api_key)
