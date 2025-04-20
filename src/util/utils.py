@@ -157,7 +157,6 @@ def find_matching_collections(question, available_collections):
             if "samsung" in collection.lower() or "삼성" in collection:
                 matched_collections.append(collection)
                 is_relevant = True
-                print(f"삼성화재 컬렉션 매칭: {collection}")
 
             # DB손해보험 컬렉션 매칭
             elif (
@@ -167,7 +166,6 @@ def find_matching_collections(question, available_collections):
             ):
                 matched_collections.append(collection)
                 is_relevant = True
-                print(f"DB손해보험 컬렉션 매칭: {collection}")
 
             # 하나손해보험 컬렉션 매칭
             elif (
@@ -177,7 +175,6 @@ def find_matching_collections(question, available_collections):
             ):
                 matched_collections.append(collection)
                 is_relevant = True
-                print(f"하나손해보험 컬렉션 매칭: {collection}")
 
             # 한화손해보험 컬렉션 매칭
             elif (
@@ -187,7 +184,6 @@ def find_matching_collections(question, available_collections):
             ):
                 matched_collections.append(collection)
                 is_relevant = True
-                print(f"한화손해보험 컬렉션 매칭: {collection}")
 
             # 흥국화재 컬렉션 매칭
             elif (
@@ -197,7 +193,6 @@ def find_matching_collections(question, available_collections):
             ):
                 matched_collections.append(collection)
                 is_relevant = True
-                print(f"흥국화재 컬렉션 매칭: {collection}")
 
             # 현대해상 컬렉션 매칭
             elif (
@@ -207,7 +202,6 @@ def find_matching_collections(question, available_collections):
             ):
                 matched_collections.append(collection)
                 is_relevant = True
-                print(f"현대해상 컬렉션 매칭: {collection}")
 
             # KB손해보험 컬렉션 매칭
             elif (
@@ -217,7 +211,6 @@ def find_matching_collections(question, available_collections):
             ):
                 matched_collections.append(collection)
                 is_relevant = True
-                print(f"KB손해보험 컬렉션 매칭: {collection}")
 
             # 롯데손해보험 컬렉션 매칭
             elif (
@@ -227,7 +220,6 @@ def find_matching_collections(question, available_collections):
             ):
                 matched_collections.append(collection)
                 is_relevant = True
-                print(f"롯데손해보험 컬렉션 매칭: {collection}")
 
             # MG손해보험 컬렉션 매칭
             elif (
@@ -235,7 +227,6 @@ def find_matching_collections(question, available_collections):
             ):
                 matched_collections.append(collection)
                 is_relevant = True
-                print(f"MG손해보험 컬렉션 매칭: {collection}")
 
             # 메리츠화재 컬렉션 매칭
             elif (
@@ -245,7 +236,6 @@ def find_matching_collections(question, available_collections):
             ):
                 matched_collections.append(collection)
                 is_relevant = True
-                print(f"메리츠화재 컬렉션 매칭: {collection}")
 
             # NH농협손해보험 컬렉션 매칭
             elif (
@@ -253,12 +243,10 @@ def find_matching_collections(question, available_collections):
             ):
                 matched_collections.append(collection)
                 is_relevant = True
-                print(f"NH농협손해보험 컬렉션 매칭: {collection}")
 
             if not is_relevant and len(mentioned_companies) == 0:
                 # 특정 보험사가 언급되지 않은 경우 모든 컬렉션 추가
                 matched_collections.append(collection)
-                print(f"기본 컬렉션 매칭: {collection}")
     else:
         # 단일 보험사만 언급된 경우
         for collection in available_collections:
@@ -266,7 +254,6 @@ def find_matching_collections(question, available_collections):
                 "samsung" in collection.lower() or "삼성" in collection
             ):
                 matched_collections.append(collection)
-                print(f"삼성화재 컬렉션 매칭: {collection}")
 
             elif "DB손해보험" in mentioned_companies and (
                 "db" in collection.lower()
@@ -274,7 +261,6 @@ def find_matching_collections(question, available_collections):
                 or "sonbo" in collection.lower()
             ):
                 matched_collections.append(collection)
-                print(f"DB손해보험 컬렉션 매칭: {collection}")
 
             elif "하나손해보험" in mentioned_companies and (
                 "hana" in collection.lower()
@@ -282,7 +268,6 @@ def find_matching_collections(question, available_collections):
                 or "ha" in collection.lower()
             ):
                 matched_collections.append(collection)
-                print(f"하나손해보험 컬렉션 매칭: {collection}")
 
             elif "한화손해보험" in mentioned_companies and (
                 "hanwha" in collection.lower()
@@ -290,7 +275,6 @@ def find_matching_collections(question, available_collections):
                 or "hw" in collection.lower()
             ):
                 matched_collections.append(collection)
-                print(f"한화손해보험 컬렉션 매칭: {collection}")
 
             elif "흥국화재" in mentioned_companies and (
                 "heung" in collection.lower()
@@ -298,7 +282,6 @@ def find_matching_collections(question, available_collections):
                 or "hg" in collection.lower()
             ):
                 matched_collections.append(collection)
-                print(f"흥국화재 컬렉션 매칭: {collection}")
 
             elif "현대해상" in mentioned_companies and (
                 "hyundai" in collection.lower()
@@ -306,7 +289,6 @@ def find_matching_collections(question, available_collections):
                 or "hd" in collection.lower()
             ):
                 matched_collections.append(collection)
-                print(f"현대해상 컬렉션 매칭: {collection}")
 
             elif "KB손해보험" in mentioned_companies and (
                 "kb" in collection.lower()
@@ -314,7 +296,6 @@ def find_matching_collections(question, available_collections):
                 or "케이비" in collection
             ):
                 matched_collections.append(collection)
-                print(f"KB손해보험 컬렉션 매칭: {collection}")
 
             elif "롯데손해보험" in mentioned_companies and (
                 "lotte" in collection.lower()
@@ -322,13 +303,11 @@ def find_matching_collections(question, available_collections):
                 or "lt" in collection.lower()
             ):
                 matched_collections.append(collection)
-                print(f"롯데손해보험 컬렉션 매칭: {collection}")
 
             elif "MG손해보험" in mentioned_companies and (
                 "mg" in collection.lower() or "MG" in collection or "엠지" in collection
             ):
                 matched_collections.append(collection)
-                print(f"MG손해보험 컬렉션 매칭: {collection}")
 
             elif "메리츠화재" in mentioned_companies and (
                 "meritz" in collection.lower()
@@ -336,18 +315,15 @@ def find_matching_collections(question, available_collections):
                 or "mz" in collection.lower()
             ):
                 matched_collections.append(collection)
-                print(f"메리츠화재 컬렉션 매칭: {collection}")
 
             elif "NH농협손해보험" in mentioned_companies and (
                 "nh" in collection.lower() or "NH" in collection or "농협" in collection
             ):
                 matched_collections.append(collection)
-                print(f"NH농협손해보험 컬렉션 매칭: {collection}")
 
             # 보험사가 언급되지 않은 경우 모든 컬렉션 추가
             elif len(mentioned_companies) == 0:
                 matched_collections.append(collection)
-                print(f"기본 컬렉션 매칭: {collection}")
 
     # 중복 제거
     matched_collections = list(set(matched_collections))

@@ -2,9 +2,10 @@ import os
 import faiss
 import numpy as np
 
+from config.settings import settings
 from models.embeddings import UpstageEmbedding
 
-upembedding = UpstageEmbedding(os.getenv("UPSTAGE_API_KEY"))
+upembedding = UpstageEmbedding(settings.upstage_api_key)
 
 
 def search(query, collections, collection_names=None, top_k=2):
@@ -54,8 +55,6 @@ def search(query, collections, collection_names=None, top_k=2):
         collection_name = collection["name"]
 
         print(f"\n검색 중: {collection_name} 컬렉션")
-        print(f"인덱스 차원: {index.d}, 인덱스 타입: {type(index)}")
-        print(f"메타데이터 타입: {type(metadata)}, 항목 수: {len(metadata)}")
 
         if query_dim != index.d:
             print(f"차원 불일치: 쿼리={query_dim}, 인덱스={index.d}")
@@ -76,7 +75,6 @@ def search(query, collections, collection_names=None, top_k=2):
 
         # 검색 전 벡터 상태 로깅
         query_norm = np.linalg.norm(query_embedding)
-        print(f"검색 전 쿼리 벡터 노름: {query_norm}")
 
         # 노름이 1과 크게 차이나면 경고
         if abs(query_norm - 1.0) > 1e-5:
@@ -84,8 +82,6 @@ def search(query, collections, collection_names=None, top_k=2):
             # 강제로 정규화
             query_embedding = query_embedding / query_norm
             print(f"강제 정규화 후 노름: {np.linalg.norm(query_embedding)}")
-
-        print(f"검색 쿼리 차원: {query_embedding.shape}")
 
         # 각 컬렉션에서 항상 top_k개의 문서 검색
         distances, indices = index.search(query_embedding, top_k)
@@ -111,7 +107,6 @@ def search(query, collections, collection_names=None, top_k=2):
 
                 # 디버깅: 메타데이터 키 확인
                 print(f"메타데이터 키 검색: {doc_id}")
-                print(f"메타데이터 키 타입: {type(doc_id)}")
 
                 # 메타데이터 키가 존재하는지 확인
                 if doc_id in metadata:

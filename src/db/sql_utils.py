@@ -1,15 +1,10 @@
-from dataclasses import asdict
-
 from config.settings import Settings, settings
 from db.schema import DB_SCHEMA
 from options.enums import Sex
 
 import simplejson as json
 import mysql.connector
-from openai import OpenAI
 from jinja2 import Environment, FileSystemLoader
-
-openai_client = OpenAI()  # TODO: main 주입받도록 변경하기
 
 
 class TemplateManager:
@@ -59,7 +54,7 @@ class JSONConverter:
         self.temperature = temperature
 
     def model(self, prompt: str):
-        response = openai_client.chat.completions.create(
+        response = self.openai_client.chat.completions.create(
             model=self.model_name,
             messages=[
                 {
@@ -89,12 +84,13 @@ class SQLGenerator:
     프롬프트와 설정값을 바탕으로 사용자의 기본정보를 추출
     """
 
-    def __init__(self, template_manager: TemplateManager):
+    def __init__(self, openai_client, template_manager: TemplateManager):
+        self.openai_client = openai_client
         self.template_manager = template_manager
         self.model_name = "gpt-4-0125-preview"
 
     def model(self, prompt: str):
-        response = openai_client.chat.completions.create(
+        response = self.openai_client.chat.completions.create(
             model=self.model_name,
             messages=[
                 {"role": "system", "content": self.generate_sql_system_prompt},

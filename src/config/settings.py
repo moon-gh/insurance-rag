@@ -1,9 +1,12 @@
+import os
 from pathlib import Path
 
 from options.enums import Sex, ProductType
 
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
+load_dotenv()
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 
 
@@ -19,8 +22,11 @@ class Settings(BaseSettings):
     db_host: str = "localhost"
     db_port: str = "3306"
     db_user: str = "root"
-    db_password: str = "12345678"  # TODO: env로 빼기
+    db_password: str = os.environ["DB_PASSWORD"]
     db_database: str = "insu"
+
+    openai_api_key: str = os.environ["OPENAI_API_KEY"]
+    upstage_api_key: str = os.environ["UPSTAGE_API_KEY"]
 
 
 settings = Settings()

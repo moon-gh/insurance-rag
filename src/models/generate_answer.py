@@ -1,6 +1,6 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.schema import SystemMessage
 from typing import Dict
 
@@ -61,7 +61,6 @@ def generate_answer(query: str, search_results: list[Dict], openai_api_key: str)
     if multiple_companies and is_comparison:
         system_prompt += " 여러 보험사의 약관을 비교 분석하여 차이점과 공통점을 명확하게 설명해주세요. 표 형식으로 정리하면 좋습니다."
 
-    print(f"🧠 시스템 프롬프트: {system_prompt[:80]}...")
     print(f"📄 문맥 길이: {len(context)}")
 
     # LCEL 스타일 체인 구성
@@ -80,10 +79,8 @@ def generate_answer(query: str, search_results: list[Dict], openai_api_key: str)
     chain: Runnable = prompt | llm
 
     # 실행
-    print("🔍 LLM 응답 생성 중...")
     response = chain.invoke({"query": query, "context": context})
 
     answer = response.content
-    print(f"✅ 응답 완료 (길이: {len(answer)} 자)")
     print(f"-------- 답변 생성 완료 --------\n")
     return answer

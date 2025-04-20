@@ -18,7 +18,7 @@ class CompareModule:
     ):
         self.config = config
         self.template_manager = template_manager
-        self.sql_generator = SQLGenerator(self.template_manager)
+        self.sql_generator = SQLGenerator(openai_client, self.template_manager)
         self.execute_query = QueryExecutor(openai_client, self.template_manager)
 
     def print_settings(self, config: Settings) -> None:
