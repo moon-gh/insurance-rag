@@ -24,7 +24,7 @@ class PolicyModule:
         self.loader = CollectionLoader(self.vector_path, UpstageEmbedding)
         # TODO: 외부에서 주입받아야 된다.
 
-    def load_collections(self, user_question):
+    def load_collections(self, user_question: str) -> bool:
         available_collections = [
             collection_name
             for collection_name in os.listdir(self.loader.base_path)
@@ -42,7 +42,6 @@ class PolicyModule:
         return True
 
     def respond_policy_question(self, user_question: str) -> str:
-        # TODO: 덩어리가 너무 크다. 하는일이 너무 많음. (시스템 디자인)
         self.load_collections(user_question)
 
         search_results = search(

@@ -14,6 +14,9 @@ from openai import OpenAI
 
 if __name__ == "__main__":
     print("\n=== 보험 상담 챗봇 ===")
+    # TODO: 초기화문이 제일 위에 있어야함.
+    template_manager = TemplateManager(templates_dir=PROJECT_ROOT / "prompts")
+    openai_client = OpenAI(api_key=settings.openai_api_key)
     # TODO: main 더 쪼개기. 별도의 클래스를 짜서 별도의 manager가 처리하게 하기
     user_question = input(
         "질문을 입력하세요 (종료하려면 'q' 또는 'quit' 입력):\n"
@@ -22,10 +25,7 @@ if __name__ == "__main__":
         print("\n프로그램을 종료합니다.")
         sys.exit()
 
-    # TODO: 초기화문이 제일 위에 있어야함.
     # TODO: Unitest code 짜기
-    template_manager = TemplateManager(templates_dir=PROJECT_ROOT / "prompts")
-    openai_client = OpenAI(api_key=settings.openai_api_key)
     classify_intent = IntentModule(openai_client, user_question, template_manager)
     policy_module = PolicyModule(openai_client, template_manager)
     compare_module = CompareModule(openai_client, template_manager)
