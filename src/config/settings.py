@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     db_password: str = os.environ["DB_PASSWORD"]
     db_database: str = "insu"
 
+    vector_path: str = "insu_data"
     openai_api_key: str = os.environ["OPENAI_API_KEY"]
     upstage_api_key: str = os.environ["UPSTAGE_API_KEY"]
 
