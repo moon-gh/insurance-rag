@@ -1,7 +1,7 @@
 # RAG (Retrieval-Augmented Generation) for 보험 챗봇
 
 이 프로젝트는 보험 관련 질의응답 시스템을 위한 Hybrid RAG(Retrieval-Augmented Generation)입니다.   
-보험 약관과 비교설계 데이터를 활용하여 사용자 질문에 정확한 답변을 제공합니다.
+보험 약관과 비교설계 데이터를 활용하여 사용자 질문에 정확한 답변을 제공합니다.  
 보험약관질의 모듈은 11개의 보험사 중 상위 2개씩을 가져와 11개의 collection을 만들어 vectorDB적재 후 검색
 비교설계 모듈은 11개의 보험사 보험료를 DB적재 및 질문에 대한 답변을 json구조로 리턴
 
