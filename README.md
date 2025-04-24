@@ -15,34 +15,34 @@
 rag/
 ├── poc/                            # 초기 코드
 ├── src/                            # 소스 코드
-│   └── config                      # 설정 폴더
-│       └── settings.py             # 설정 파일
-│   └── db                          # DB 폴더
-│       ├── schema.py               # 스키마 파일
-│       └── sql_utils.py            # sql 유틸리티 파일
-│   └── models                      # 모델 폴더
-│       ├── collection_loader.py    # 콜렉션 로더 파일
-│       ├── generate_answer.py      # 답변 생성 파일
-│       ├── search.py               # 검색 파일
-│       └── embeddings.py           # 임베딩 파일
-│   └── modules                     # 모듈 폴더
-│       ├── compare.py              # 비교약관 모듈
-│       ├── intent.py               # 의도분류 모듈
-│       └── policy.py               # 정책질의 모듈
-│   └── options                     # 유틸리티 함수
-│       └── enums.py
-│   └── prompts                     # 프롬프트 폴더
-│       ├── base_prompt.jinja2
-│       ├── example_prompt.jinja2
-│       └── intent_prompt.jinja2
+│   ├── config                      # 설정 폴더
+│   │   └── settings.py             
+│   ├── db                          # DB 폴더
+│   │   ├── schema.py               
+│   │   └── sql_utils.py            
+│   ├── models                      
+│   │   ├── collection_loader.py    # 콜렉션 로더 파일
+│   │   ├── generate_answer.py      # 답변 생성 파일
+│   │   ├── search.py               # 검색 파일
+│   │   └── embeddings.py           # 임베딩 파일
+│   ├── modules                     
+│   │   ├── compare.py              # 비교약관 모듈
+│   │   ├── intent.py               # 의도분류 모듈
+│   │   └── policy.py               # 정책질의 모듈
+│   ├── options                     
+│   │   └── enums.py
+│   ├── prompts                     # 프롬프트 폴더
+│   │   ├── base_prompt.jinja2
+│   │   ├── example_prompt.jinja2
+│   │   └── intent_prompt.jinja2
 │   ├── tests                       # 테스트 폴더
-│   └── util                        # 유틸리티 폴더
-│       └── utils.py                # 유틸리티 파일
-│   ├── main.py                     # 메인 실행 파일
-├── insu_data/                      # 벡터 DB 저장소
-│   ├── Samsung_YakMu2404103NapHae20250113/
-│   ├── DBSonBo_YakMu20250123/
-│   └── ...
+│   ├── util                        # 유틸리티 폴더
+│   │   └── utils.py                # 유틸리티 파일
+│   ├── insu_data/                  # 벡터 DB 저장소
+│   │   ├── Samsung_YakMu2404103NapHae20250113/
+│   │   ├── DBSonBo_YakMu20250123/
+│   │   └── ...
+│   └── main.py
 ├── .gitignore                      
 ├── README.md
 └── requirements.txt
