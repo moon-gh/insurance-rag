@@ -1,5 +1,5 @@
 import sys
-from pathlib import Path
+from abc import ABC, abstractmethod
 
 from config.settings import PROJECT_ROOT, settings
 from modules.intent import IntentModule
@@ -9,32 +9,58 @@ from db.sql_utils import TemplateManager
 
 from openai import OpenAI
 
+
 # TODO: isort setting precommit setting
+class Handler(ABC):
+    @abstractmethod
+    def handle(self, question: str) -> str:
+        pass
+
+
+class CompareHandler(Handler):
+    def __init__(self, llm_client: OpenAI, template_manager: TemplateManager):
+        self.compare_module = CompareModule(llm_client, template_manager)
+
+    def handle(self, question: str) -> str:
+        return self.compare_module.get_search_result(question)
+
+
+class PolicyHandler(Handler):
+    def __init__(self, llm_client: OpenAI, template_manager: TemplateManager):
+        self.policy_module = PolicyModule(llm_client, template_manager)
+
+    def handle(self, question: str) -> str:
+        return self.policy_module.respond_policy_question(question)
+
+
+class HandlerFactory:
+    @staticmethod
+    def get_handler(
+        intent: str, llm_client: OpenAI, template_manager: TemplateManager
+    ) -> Handler:
+        if intent == "비교설계 질문":
+            return CompareHandler(llm_client, template_manager)
+        return PolicyHandler(llm_client, template_manager)
 
 
 if __name__ == "__main__":
-    print("\n=== 보험 상담 챗봇 ===")
-    # TODO: 초기화문이 제일 위에 있어야함.
+    print("\n=== 보험 상담 챗봇 (Factory Pattern) ===")
+
     template_manager = TemplateManager(templates_dir=PROJECT_ROOT / "prompts")
     openai_client = OpenAI(api_key=settings.openai_api_key)
-    # TODO: main 더 쪼개기. 별도의 클래스를 짜서 별도의 manager가 처리하게 하기
+
     user_question = input(
-        "질문을 입력하세요 (종료하려면 'q' 또는 'quit' 입력):\n"
+        "질문을 입력하세요 (종료하려면 'q', 'quit', 'exit' 입력):\n"
     ).strip()
     if user_question in ["q", "quit", "exit"]:
         print("\n프로그램을 종료합니다.")
         sys.exit()
 
-    # TODO: Unitest code 짜기
-    classify_intent = IntentModule(openai_client, user_question, template_manager)
-    policy_module = PolicyModule(openai_client, template_manager)
-    compare_module = CompareModule(openai_client, template_manager)
-    result_intent = classify_intent.classify_response()
+    intent = IntentModule(
+        openai_client, user_question, template_manager
+    ).classify_response()
+    print(f"[Intent]: {intent}")
 
-    # TODO: 별도의 메소드? intent에 따라서... mediator pattern이나 factory pattern abc 클래스 상속받기
-    if result_intent == "비교설계 질문":  # TODO: 비교설계 질문 enum으로 바꾸기
-        print(result_intent)
-        print(compare_module.get_search_result(user_question))
-    else:
-        print(result_intent)
-        print(policy_module.respond_policy_question(user_question))
+    handler = HandlerFactory.get_handler(intent, openai_client, template_manager)
+    response = handler.handle(user_question)
+    print(response)
