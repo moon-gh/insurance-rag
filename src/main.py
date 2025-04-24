@@ -6,6 +6,7 @@ from modules.intent import IntentModule
 from modules.compare import CompareModule
 from modules.policy import PolicyModule
 from db.sql_utils import TemplateManager
+from options.enums import IntentType
 
 from openai import OpenAI
 
@@ -38,7 +39,7 @@ class HandlerFactory:
     def get_handler(
         intent: str, llm_client: OpenAI, template_manager: TemplateManager
     ) -> Handler:
-        if intent == "비교설계 질문":
+        if intent == IntentType.COMPARE_QUESTION:
             return CompareHandler(llm_client, template_manager)
         return PolicyHandler(llm_client, template_manager)
 

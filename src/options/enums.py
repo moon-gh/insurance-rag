@@ -9,3 +9,7 @@ class Sex(IntEnum):
 class ProductType(StrEnum):
     NON_REFUND = "nr"  # 무해지환급형
     REFUND = "r"  # 해지환급형
+
+
+class IntentType(StrEnum):
+    COMPARE_QUESTION = "비교설계 질문"
