@@ -7,16 +7,14 @@ class IntentModule:
     def __init__(
         self,
         openai_client: OpenAI,
-        user_question: str,
         template_manager: TemplateManager,
     ):
         self.openai_client = openai_client
-        self.user_question = user_question
         self.template_manager = template_manager
 
-    def classify_response(self) -> str:
+    def classify_response(self, user_question) -> str:
         intent_template_prompt = self.template_manager.render(
-            "intent_prompt.jinja2", question=self.user_question
+            "intent_prompt.jinja2", question=user_question
         )
         response = self.openai_client.chat.completions.create(
             model="gpt-4-turbo",
