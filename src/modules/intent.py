@@ -12,9 +12,9 @@ class IntentModule:
         self.openai_client = openai_client
         self.template_manager = template_manager
 
-    def classify_response(self, user_question) -> str:
+    def classify_response(self, user_input: str) -> str:
         intent_template_prompt = self.template_manager.render(
-            "intent_prompt.jinja2", question=user_question
+            "intent_prompt.jinja2", question=user_input
         )
         response = self.openai_client.chat.completions.create(
             model="gpt-4-turbo",

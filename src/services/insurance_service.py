@@ -28,9 +28,5 @@ class InsuranceService:
             print(response)
 
     def run(self) -> None:
-        # TODO: To be removed
-        # if user_question in ["q", "quit", "exit"]:
-        #     print("\n프로그램을 종료합니다.")
-        #     sys.exit()
         user_input = self.__get_user_input()
         self.__handle_user_input(user_input)
