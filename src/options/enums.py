@@ -21,3 +21,7 @@ class ConversationFlow(StrEnum):
     INTENT = "intent"
     RESULT = "result"
     END = "end"
+
+
+class ModelType(StrEnum):
+    INTENT_MODEL = "gpt-4-turbo"

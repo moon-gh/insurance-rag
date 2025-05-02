@@ -8,7 +8,7 @@ from models.collection_loader import CollectionLoader
 from models.embeddings import UpstageEmbedding
 from models.generate_answer import ResponseSearch
 from db.sql_utils import TemplateManager, SQLGenerator, QueryExecutor
-from options.enums import IntentType, ProductType, Sex
+from options.enums import IntentType, ProductType, Sex, ModelType
 
 from openai import OpenAI
 
@@ -32,7 +32,7 @@ class IntentHandler(Handler):
             "intent_prompt.jinja2", question=user_input
         )
         response = self.openai_client.chat.completions.create(
-            model="gpt-4-turbo",
+            model=ModelType.INTENT_MODEL,
             messages=[
                 {
                     "role": "system",
