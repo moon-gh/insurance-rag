@@ -8,3 +8,4 @@ langchain-openai==0.3.14
 langchain-community==0.3.21
 langchain-upstage==0.6.0
 pydantic-settings==2.8.1
+pytest==8.3.5

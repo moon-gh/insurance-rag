@@ -13,6 +13,7 @@ class ProductType(StrEnum):
 
 class IntentType(StrEnum):
     COMPARE_QUESTION = "비교설계 질문"
+    POLICY_QUESTION = "보험약관 질문"
 
 
 class ConversationFlow(StrEnum):

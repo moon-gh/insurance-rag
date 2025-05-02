@@ -2,24 +2,22 @@ import os
 from abc import ABC, abstractmethod
 
 from config.settings import Settings, settings
-from util.utils import process_query
-from util.utils import find_matching_collections
+from util.utils import process_query, find_matching_collections
 from models.search import search
 from models.collection_loader import CollectionLoader
 from models.embeddings import UpstageEmbedding
-from models.generate_answer import generate_answer
-from modules.policy import PolicyModule
-from db.sql_utils import (
-    TemplateManager,
-    SQLGenerator,
-    QueryExecutor,
-)
-from options.enums import IntentType
+from models.generate_answer import ResponseSearch
+from db.sql_utils import TemplateManager, SQLGenerator, QueryExecutor
+from options.enums import IntentType, ProductType, Sex
 
 from openai import OpenAI
 
 
 class Handler(ABC):
+    def __init__(self, openai_client: OpenAI, template_manager: TemplateManager):
+        self.openai_client = openai_client
+        self.template_manager = template_manager
+
     @abstractmethod
     def handle(self, user_input: str) -> str:
         raise NotImplementedError("Handler should be implemented")
@@ -27,8 +25,7 @@ class Handler(ABC):
 
 class IntentHandler(Handler):
     def __init__(self, openai_client: OpenAI, template_manager: TemplateManager):
-        self.openai_client = openai_client
-        self.template_manager = template_manager
+        super().__init__(openai_client, template_manager)
 
     def handle(self, user_input: str) -> str:
         intent_template_prompt = self.template_manager.render(
@@ -54,14 +51,18 @@ class CompareHandler(Handler):
         template_manager: TemplateManager,
         config: Settings = settings,
     ):
+        super().__init__(openai_client, template_manager)
         self.config = config
-        self.template_manager = template_manager
         self.sql_generator = SQLGenerator(openai_client, self.template_manager)
         self.execute_query = QueryExecutor(openai_client, self.template_manager)
 
     def print_settings(self, config: Settings) -> None:
-        gender = "남자" if config.sex == 1 else "여자"
-        product_type = "무해지형" if config.product_type == "nr" else "해지환급형"
+        gender = "남자" if config.sex == Sex.MALE else "여자"
+        product_type = (
+            "무해지형"
+            if config.product_type == ProductType.NON_REFUND
+            else "해지환급형"
+        )
         print("\n=== 실행 결과 ===")
         print("\n[설정값]")
         print(f"이름: {config.custom_name}")
@@ -81,13 +82,13 @@ class CompareHandler(Handler):
 
 class PolicyHandler(Handler):
     def __init__(self, openai_client: OpenAI, template_manager: TemplateManager):
-        self.openai_client = openai_client
-        self.template_manager = template_manager
+        super().__init__(openai_client, template_manager)
         self.vector_path = settings.vector_path
-        self.collections: list = []  # TODO: 다시 확인
+        self.collections: list = []
         self.loader = CollectionLoader(self.vector_path, UpstageEmbedding)
+        self.response = ResponseSearch(settings.openai_client)
 
-    def load_collections(self, user_question: str) -> bool:
+    def load_collections(self, user_input: str) -> None:
         available_collections = [
             collection_name
             for collection_name in os.listdir(self.loader.base_path)
@@ -97,12 +98,11 @@ class PolicyHandler(Handler):
         self.use_collections = (
             self.collections
             if self.collections
-            else find_matching_collections(user_question, available_collections)
+            else find_matching_collections(user_input, available_collections)
         )
 
         for use_collection_name in self.use_collections:
             self.loader.load_collection(use_collection_name)
-        return True
 
     def handle(self, user_input: str) -> str:
         self.load_collections(user_input)
@@ -111,7 +111,7 @@ class PolicyHandler(Handler):
             user_input, self.loader.collections, self.use_collections, top_k=2
         )
 
-        answer = generate_answer(user_input, search_results, settings.openai_api_key)
+        answer = self.response.generate_answer(user_input, search_results)
         return answer
 
 
@@ -122,4 +122,6 @@ class HandlerFactory:
     ) -> Handler:
         if intent == IntentType.COMPARE_QUESTION:
             return CompareHandler(openai_client, template_manager)
-        return PolicyHandler(openai_client, template_manager)
+        if intent == IntentType.POLICY_QUESTION:
+            return PolicyHandler(openai_client, template_manager)
+        raise ValueError("올바른 intent type이 아닙니다.")
