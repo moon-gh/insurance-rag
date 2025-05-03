@@ -49,12 +49,13 @@ class CompareHandler(Handler):
         self,
         openai_client: OpenAI,
         template_manager: TemplateManager,
+        execute_query: QueryExecutor,
         config: Settings = settings,
     ):
         super().__init__(openai_client, template_manager)
         self.config = config
         self.sql_generator = SQLGenerator(openai_client, self.template_manager)
-        self.execute_query = QueryExecutor(openai_client, self.template_manager)
+        self.execute_query = execute_query
 
     def print_settings(self, config: Settings) -> None:
         gender = "남자" if config.sex == Sex.MALE else "여자"
@@ -120,8 +121,9 @@ class HandlerFactory:
     def get_handler(
         intent: str, openai_client: OpenAI, template_manager: TemplateManager
     ) -> Handler:
+        query_executor = QueryExecutor(openai_client, template_manager)
         if intent == IntentType.COMPARE_QUESTION:
-            return CompareHandler(openai_client, template_manager)
+            return CompareHandler(openai_client, template_manager, query_executor)
         if intent == IntentType.POLICY_QUESTION:
             return PolicyHandler(openai_client, template_manager)
         raise ValueError("올바른 intent type이 아닙니다.")
