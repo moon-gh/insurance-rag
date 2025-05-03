@@ -85,7 +85,7 @@ class PolicyHandler(Handler):
     def __init__(self, openai_client: OpenAI, template_manager: TemplateManager):
         super().__init__(openai_client, template_manager)
         self.vector_path = settings.vector_path
-        self.collections: list = []
+        self.collections: list[str] = []
         self.loader = CollectionLoader(self.vector_path, UpstageEmbedding)
         self.response = ResponseSearch(settings.openai_client)
 
