@@ -8,7 +8,7 @@ from models.collection_loader import CollectionLoader
 from models.embeddings import UpstageEmbedding
 from models.generate_answer import ResponseSearch
 from db.sql_utils import TemplateManager, SQLGenerator, QueryExecutor
-from options.enums import IntentType, ProductType, Sex, ModelType
+from options.enums import IntentType, ModelType
 
 from openai import OpenAI
 
@@ -50,34 +50,24 @@ class CompareHandler(Handler):
         openai_client: OpenAI,
         template_manager: TemplateManager,
         execute_query: QueryExecutor,
-        config: Settings = settings,
+        settings: Settings = settings,
     ):
         super().__init__(openai_client, template_manager)
-        self.config = config
+        self.settings = settings
         self.sql_generator = SQLGenerator(openai_client, self.template_manager)
         self.execute_query = execute_query
 
-    def print_settings(self, config: Settings) -> None:
-        gender = "남자" if config.sex == Sex.MALE else "여자"
-        product_type = (
-            "무해지형"
-            if config.product_type == ProductType.NON_REFUND
-            else "해지환급형"
-        )
-        print("\n=== 실행 결과 ===")
-        print("\n[설정값]")
-        print(f"이름: {config.custom_name}")
-        print(f"나이: {config.insu_age}세")
-        print(f"성별: {gender}")
-        print(f"상품유형: {product_type}")
-        print(f"보험기간: {config.expiry_year}")
+    def print_settings(self, settings: Settings) -> None:
+        print(repr(settings))
 
     def handle(self, user_input: str) -> str:
-        prompt, current_config = process_query(user_input, self.config)
-        self.config = current_config
-        generated_sql = self.sql_generator.generate(prompt, self.config)
-        self.print_settings(self.config)
-        search_result = self.execute_query.execute_sql_query(generated_sql, self.config)
+        prompt, current_settings = process_query(user_input, self.settings)
+        self.settings = current_settings
+        generated_sql = self.sql_generator.generate(prompt, self.settings)
+        self.print_settings(self.settings)
+        search_result = self.execute_query.execute_sql_query(
+            generated_sql, self.settings
+        )
         return search_result
 
 
