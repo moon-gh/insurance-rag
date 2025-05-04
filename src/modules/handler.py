@@ -6,7 +6,7 @@ from util.utils import process_query, find_matching_collections
 from models.search import search
 from models.collection_loader import CollectionLoader
 from models.embeddings import UpstageEmbedding
-from models.generate_answer import ResponseSearch
+from models.generate_answer import PolicyResponse
 from db.sql_utils import TemplateManager, SQLGenerator, QueryExecutor
 from options.enums import IntentType, ModelType
 
@@ -50,11 +50,12 @@ class CompareHandler(Handler):
         openai_client: OpenAI,
         template_manager: TemplateManager,
         execute_query: QueryExecutor,
+        sql_generator: SQLGenerator,
         settings: Settings = settings,
     ):
         super().__init__(openai_client, template_manager)
         self.settings = settings
-        self.sql_generator = SQLGenerator(openai_client, self.template_manager)
+        self.sql_generator = sql_generator
         self.execute_query = execute_query
 
     def print_settings(self, settings: Settings) -> None:
@@ -72,12 +73,17 @@ class CompareHandler(Handler):
 
 
 class PolicyHandler(Handler):
-    def __init__(self, openai_client: OpenAI, template_manager: TemplateManager):
+    def __init__(
+        self,
+        openai_client: OpenAI,
+        template_manager: TemplateManager,
+        collection_loader: CollectionLoader,
+        response_policy: PolicyResponse,
+    ):
         super().__init__(openai_client, template_manager)
-        self.vector_path = settings.vector_path
         self.collections: list[str] = []
-        self.loader = CollectionLoader(self.vector_path, UpstageEmbedding)
-        self.response = ResponseSearch(settings.openai_client)
+        self.loader = collection_loader
+        self.response_policy = response_policy
 
     def load_collections(self, user_input: str) -> None:
         available_collections = [
@@ -102,7 +108,7 @@ class PolicyHandler(Handler):
             user_input, self.loader.collections, self.use_collections, top_k=2
         )
 
-        answer = self.response.generate_answer(user_input, search_results)
+        answer = self.response_policy.generate_answer(user_input, search_results)
         return answer
 
 
@@ -111,9 +117,18 @@ class HandlerFactory:
     def get_handler(
         intent: str, openai_client: OpenAI, template_manager: TemplateManager
     ) -> Handler:
+        generate_sql_query = SQLGenerator(openai_client, template_manager)
         query_executor = QueryExecutor(openai_client, template_manager)
+        collection_loader = CollectionLoader(settings.vector_path, UpstageEmbedding)
+        response = ResponseSearch(openai_client)
         if intent == IntentType.COMPARE_QUESTION:
-            return CompareHandler(openai_client, template_manager, query_executor)
+            return CompareHandler(
+                openai_client, template_manager, query_executor, generate_sql_query
+            )
         if intent == IntentType.POLICY_QUESTION:
-            return PolicyHandler(openai_client, template_manager)
+            return PolicyHandler(
+                openai_client,
+                template_manager,
+                collection_loader,
+            )
         raise ValueError("올바른 intent type이 아닙니다.")

@@ -5,7 +5,7 @@ from langchain_core.runnables import Runnable
 from langchain_core.output_parsers import StrOutputParser
 
 
-class ResponseSearch:
+class PolicyResponse:
     def __init__(self, openai_client: str):
         if not openai_client:
             return "OpenAI API key가 제공되지 않았습니다. 환경 변수 OPENAI_API_KEY를 설정해주세요."
