@@ -64,6 +64,7 @@ class JSONConverter:
                 {"role": "user", "content": prompt},
             ],
             temperature=self.temperature,
+            response_format={"type": "json_object"},
         )
         response_text = response.choices[0].message.content
         return response_text
@@ -75,13 +76,12 @@ class JSONConverter:
         )
         convert_json_prompt = convert_prompt + converter_json_data
         response = self.model(convert_json_prompt)
-        json_str = response.replace("```json", "").replace("```", "").strip()
-        return json_str
+        return response
 
 
 class SQLGenerator:
     """
-    프롬프트와 설정값을 바탕으로 사용자의 기본정보를 추출
+    프롬프트에 있는 사용자 정보를 추출해 관련 보험을 조회하는 SQL 쿼리생성
     """
 
     def __init__(self, openai_client, template_manager: TemplateManager):
@@ -97,6 +97,7 @@ class SQLGenerator:
                 {"role": "user", "content": prompt},
             ],
             temperature=0,
+            response_format={"type": "text"},
         )
         return response
 
@@ -112,7 +113,6 @@ class SQLGenerator:
         )
         model = self.model(prompt)
         sql_query = model.choices[0].message.content.strip()
-        sql_query = sql_query.replace("```sql", "").replace("```", "").strip()
         return sql_query
 
 

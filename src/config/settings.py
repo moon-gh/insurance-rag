@@ -26,8 +26,23 @@ class Settings(BaseSettings):
     db_database: str = "insu"
 
     vector_path: str = "insu_data"
-    openai_api_key: str = os.environ["OPENAI_API_KEY"]
+    openai_client: str = os.environ["OPENAI_API_KEY"]
     upstage_api_key: str = os.environ["UPSTAGE_API_KEY"]
+
+    def __repr__(self) -> str:
+        gender = "남자" if self.sex == Sex.MALE else "여자"
+        product_type = (
+            "무해지형" if self.product_type == ProductType.NON_REFUND else "해지환급형"
+        )
+        return (
+            "\n=== 실행 결과 ===\n"
+            "\n[설정값]\n"
+            f"이름: {self.custom_name}\n"
+            f"나이: {self.insu_age}세\n"
+            f"성별: {gender}\n"
+            f"상품유형: {product_type}\n"
+            f"보험기간: {self.expiry_year}"
+        )
 
 
 settings = Settings()
