@@ -3,6 +3,7 @@ from langchain.schema import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
 from langchain_core.output_parsers import StrOutputParser
+from config.settings import settings
 
 
 class PolicyResponse:
@@ -50,7 +51,7 @@ class PolicyResponse:
     def policy_model(self) -> ChatOpenAI:
         llm = ChatOpenAI(
             model="gpt-4o-mini",
-            api_key=self.openai_client,
+            api_key=settings.openai_client,
             temperature=0.7,
             max_tokens=2000,
         )

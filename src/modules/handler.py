@@ -120,15 +120,13 @@ class HandlerFactory:
         generate_sql_query = SQLGenerator(openai_client, template_manager)
         query_executor = QueryExecutor(openai_client, template_manager)
         collection_loader = CollectionLoader(settings.vector_path, UpstageEmbedding)
-        response = ResponseSearch(openai_client)
+        response_policy = PolicyResponse(openai_client)
         if intent == IntentType.COMPARE_QUESTION:
             return CompareHandler(
                 openai_client, template_manager, query_executor, generate_sql_query
             )
         if intent == IntentType.POLICY_QUESTION:
             return PolicyHandler(
-                openai_client,
-                template_manager,
-                collection_loader,
+                openai_client, template_manager, collection_loader, response_policy
             )
         raise ValueError("올바른 intent type이 아닙니다.")
