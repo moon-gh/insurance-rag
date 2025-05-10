@@ -1,4 +1,5 @@
 src/insu_data/*
+study/*
 files/*
 .env
 
