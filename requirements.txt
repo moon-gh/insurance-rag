@@ -1,4 +1,4 @@
-openai==1.66.5
+openai==1.68.2
 mysql-connector-python==9.2.0
 simplejson==3.20.1
 faiss-cpu==1.10.0
@@ -9,3 +9,5 @@ langchain-community==0.3.21
 langchain-upstage==0.6.0
 pydantic-settings==2.8.1
 pytest==8.3.5
+isort==6.0.1
+
