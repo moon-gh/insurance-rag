@@ -3,6 +3,7 @@ study
 files
 poc/
 .env
+src/models/vectorstore_for_test.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

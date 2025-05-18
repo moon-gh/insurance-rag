@@ -1,12 +1,9 @@
-import os
 from pathlib import Path
 
-from dotenv import load_dotenv
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from options.enums import ProductType, Sex
 
-load_dotenv()
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 
 
@@ -22,12 +19,14 @@ class Settings(BaseSettings):
     db_host: str = "localhost"
     db_port: str = "3306"
     db_user: str = "root"
-    db_password: str = os.environ["DB_PASSWORD"]
+    db_password: str
     db_database: str = "insu"
 
     vector_path: str = "insu_data"
-    openai_client: str = os.environ["OPENAI_API_KEY"]
-    upstage_api_key: str = os.environ["UPSTAGE_API_KEY"]
+    openai_api_key: str
+    upstage_api_key: str
+
+    model_config = SettingsConfigDict(env_file=f"{PROJECT_ROOT}/.env", env_file_encoding="utf-8")
 
     def __repr__(self) -> str:
         gender = "남자" if self.sex == Sex.MALE else "여자"

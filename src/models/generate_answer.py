@@ -5,22 +5,21 @@ from langchain_core.runnables import Runnable
 from langchain_openai import ChatOpenAI
 
 from config.settings import settings
+from options.enums import CompanyNameRelevanceTextPair
 
 
 class PolicyResponse:
     def __init__(self, openai_client: str):
         if not openai_client:
-            return "OpenAI API key가 제공되지 않았습니다. 환경 변수 OPENAI_API_KEY를 설정해주세요."
+            raise RuntimeError("OpenAI API key가 제공되지 않았습니다. OPENAI_API_KEY를 설정해주세요.")
         self.openai_client = openai_client
-        self.company_results = {}
+        self.company_results: CompanyNameRelevanceTextPair = {}
 
     def extract_company_info(self, search_results: list[dict]) -> str:
         for result in search_results:
             collection_name = result.get("collection", "")
             self.company_results.setdefault(collection_name, []).append(result)
-
         self.multiple_companies = len(self.company_results) > 1
-
         context = ""
         for company, results in self.company_results.items():
             company_context = ""
@@ -51,8 +50,8 @@ class PolicyResponse:
     def policy_model(self) -> ChatOpenAI:
         llm = ChatOpenAI(
             model="gpt-4o-mini",
-            api_key=settings.openai_client,
-            temperature=0.7,
+            api_key=settings.openai_api_key,
+            temperature=0.3,
             max_tokens=2000,
         )
         return llm

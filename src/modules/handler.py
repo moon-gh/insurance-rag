@@ -24,6 +24,8 @@ class Handler(ABC):
 
 
 class IntentHandler(Handler):
+    system_prompt = "너는 GA 보험설계사들이 사용하는 보험전문 챗봇이야."
+
     def __init__(self, openai_client: OpenAI, template_manager: TemplateManager):
         super().__init__(openai_client, template_manager)
 
@@ -32,10 +34,7 @@ class IntentHandler(Handler):
         response = self.openai_client.chat.completions.create(
             model=ModelType.INTENT_MODEL,
             messages=[
-                {
-                    "role": "system",
-                    "content": "너는 GA 보험설계사들이 사용하는 보험전문 챗봇이야.",
-                },
+                {"role": "system", "content": self.system_prompt},
                 {"role": "user", "content": intent_template_prompt},
             ],
         )
