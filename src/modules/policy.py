@@ -1,14 +1,14 @@
 import os
 
+from openai import OpenAI
+
 from config.settings import settings
 from db.sql_utils import TemplateManager
-from models.search import search
 from models.collection_loader import CollectionLoader
 from models.embeddings import UpstageEmbedding
 from models.generate_answer import generate_answer
+from models.search import search
 from util.utils import find_matching_collections
-
-from openai import OpenAI
 
 
 class PolicyModule:
@@ -32,9 +32,7 @@ class PolicyModule:
         ]
 
         self.use_collections = (
-            self.collections
-            if self.collections
-            else find_matching_collections(user_question, available_collections)
+            self.collections if self.collections else find_matching_collections(user_question, available_collections)
         )
 
         for use_collection_name in self.use_collections:
@@ -44,9 +42,7 @@ class PolicyModule:
     def respond_policy_question(self, user_question: str) -> str:
         self.load_collections(user_question)
 
-        search_results = search(
-            user_question, self.loader.collections, self.use_collections, top_k=2
-        )
+        search_results = search(user_question, self.loader.collections, self.use_collections, top_k=2)
 
         answer = generate_answer(user_question, search_results, settings.openai_api_key)
         return answer

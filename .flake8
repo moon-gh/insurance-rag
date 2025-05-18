@@ -1,0 +1,4 @@
+[flake8]
+exclude = ".git,__pycache__,build,dist,sample,tests,*.egg-info"
+max-line-length = 120
+max-complexity = 50

@@ -1,7 +1,7 @@
-src/insu_data/*
-study/*
-files/*
-study/*
+src/insu_data
+study
+files
+poc/
 .env
 
 # Byte-compiled / optimized / DLL files

@@ -1,6 +1,6 @@
 import os
-import numpy as np
 
+import numpy as np
 from langchain_upstage import UpstageEmbeddings
 
 
@@ -8,9 +8,7 @@ class UpstageEmbedding:
     def __init__(self, upstage_api_key=None):
         self.api_key = upstage_api_key or os.getenv("UPSTAGE_API_KEY")
         if not self.api_key or len(self.api_key) < 10:
-            raise ValueError(
-                f"유효한 Upstage API 키가 없습니다. 현재 키: {self.api_key}"
-            )
+            raise ValueError(f"유효한 Upstage API 키가 없습니다. 현재 키: {self.api_key}")
         self.cached_embeddings = {}
         self.upstage = UpstageEmbeddings(
             api_key=self.api_key,

@@ -1,7 +1,7 @@
 # DB 스키마 정의
 DB_SCHEMA = """-- 1. 데이터베이스 생성
 CREATE DATABASE IF NOT EXISTS insu DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE insu; 
+USE insu;
 
 -- 2. 보험 비교 설계 테이블 (comparison)
 CREATE TABLE comparison (

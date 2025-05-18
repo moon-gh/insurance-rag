@@ -1,16 +1,14 @@
-import os
 import json
-import faiss
+import os
 from pathlib import Path
 
+import faiss
 from langchain.embeddings.base import Embeddings
 
 
 class CollectionLoader:
     def __init__(self, vector_path: str, embeddings: Embeddings):
-        self.base_path = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)), vector_path
-        )
+        self.base_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), vector_path)
         self.embeddings = embeddings
         self.collections = []
         self.collection_to_company_mapping = {
@@ -40,16 +38,14 @@ class CollectionLoader:
 
         path = Path(folder_path)
         index_path = str(path / f"{index_name}.{index_extend}")
-        metadata_path = str(path / f"metadata.json")
+        metadata_path = str(path / "metadata.json")
         index = faiss.read_index(index_path)
 
         if not os.path.exists(index_path):
             raise FileNotFoundError(f"인덱스 파일을 찾을 수 없습니다: {index_path}")
 
         if not os.path.exists(metadata_path):
-            raise FileNotFoundError(
-                f"메타데이터 파일을 찾을 수 없습니다: {metadata_path}"
-            )
+            raise FileNotFoundError(f"메타데이터 파일을 찾을 수 없습니다: {metadata_path}")
 
         with open(metadata_path, "r", encoding="utf-8") as f:
             metadata_raw = json.load(f)
@@ -136,9 +132,7 @@ class CollectionLoader:
         original_name = collection_name
 
         # 매핑 적용
-        actual_collection_name = collection_mapping.get(
-            collection_name, collection_name
-        )
+        actual_collection_name = collection_mapping.get(collection_name, collection_name)
 
         # 원본 이름과 매핑된 이름이 다른 경우 로그 출력
         if original_name != actual_collection_name:
@@ -152,10 +146,7 @@ class CollectionLoader:
                 print(f"  - {d}")
 
             # sonbo/SONBO/Sonbo 대소문자 문제 처리
-            if (
-                "sonbo" in actual_collection_name.lower()
-                or "손보" in actual_collection_name
-            ):
+            if "sonbo" in actual_collection_name.lower() or "손보" in actual_collection_name:
                 # 실제 존재하는 디렉토리 찾기
                 for dir_name in os.listdir(self.base_path):
                     if "sonbo" in dir_name.lower() or "SonBo" in dir_name:
@@ -169,8 +160,6 @@ class CollectionLoader:
         )
 
         # 메타데이터 개수 확인
-        self.collections.append(
-            {"name": collection_name, "index": index, "metadata": metadata}
-        )
+        self.collections.append({"name": collection_name, "index": index, "metadata": metadata})
 
         return self.collections

@@ -1,8 +1,9 @@
-from langchain_openai import ChatOpenAI
 from langchain.schema import SystemMessage
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
-from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import ChatOpenAI
+
 from config.settings import settings
 
 
@@ -14,7 +15,6 @@ class PolicyResponse:
         self.company_results = {}
 
     def extract_company_info(self, search_results: list[dict]) -> str:
-
         for result in search_results:
             collection_name = result.get("collection", "")
             self.company_results.setdefault(collection_name, []).append(result)
@@ -60,7 +60,7 @@ class PolicyResponse:
     def generate_answer(self, user_input: str, search_results: list[dict]) -> str:
         if not search_results:
             return "검색 결과가 없습니다. 다른 질문을 시도해보세요."
-        print(f"\n-------- 답변 생성 시작 --------")
+        print("\n-------- 답변 생성 시작 --------")
         print(f"질문: '{user_input}'")
         print(f"검색 결과 수: {len(search_results)}")
         context = self.extract_company_info(search_results)

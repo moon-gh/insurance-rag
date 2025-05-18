@@ -1,10 +1,10 @@
+import mysql.connector
+import simplejson as json
+from jinja2 import Environment, FileSystemLoader
+
 from config.settings import Settings, settings
 from db.schema import DB_SCHEMA
 from options.enums import Sex
-
-import simplejson as json
-import mysql.connector
-from jinja2 import Environment, FileSystemLoader
 
 
 class TemplateManager:
@@ -71,9 +71,7 @@ class JSONConverter:
 
     def convert(self, generate_json_data: dict) -> str:
         convert_prompt = self.template_manager.render("example_prompt.jinja2")
-        converter_json_data = json.dumps(
-            generate_json_data, ensure_ascii=False, indent=2, use_decimal=True
-        )
+        converter_json_data = json.dumps(generate_json_data, ensure_ascii=False, indent=2, use_decimal=True)
         convert_json_prompt = convert_prompt + converter_json_data
         response = self.model(convert_json_prompt)
         return response

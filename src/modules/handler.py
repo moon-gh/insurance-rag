@@ -1,16 +1,16 @@
 import os
 from abc import ABC, abstractmethod
 
+from openai import OpenAI
+
 from config.settings import Settings, settings
-from util.utils import process_query, find_matching_collections
-from models.search import search
+from db.sql_utils import QueryExecutor, SQLGenerator, TemplateManager
 from models.collection_loader import CollectionLoader
 from models.embeddings import UpstageEmbedding
 from models.generate_answer import PolicyResponse
-from db.sql_utils import TemplateManager, SQLGenerator, QueryExecutor
+from models.search import search
 from options.enums import IntentType, ModelType
-
-from openai import OpenAI
+from util.utils import find_matching_collections, process_query
 
 
 class Handler(ABC):
@@ -28,9 +28,7 @@ class IntentHandler(Handler):
         super().__init__(openai_client, template_manager)
 
     def handle(self, user_input: str) -> str:
-        intent_template_prompt = self.template_manager.render(
-            "intent_prompt.jinja2", question=user_input
-        )
+        intent_template_prompt = self.template_manager.render("intent_prompt.jinja2", question=user_input)
         response = self.openai_client.chat.completions.create(
             model=ModelType.INTENT_MODEL,
             messages=[
@@ -66,9 +64,7 @@ class CompareHandler(Handler):
         self.settings = current_settings
         generated_sql = self.sql_generator.generate(prompt, self.settings)
         self.print_settings(self.settings)
-        search_result = self.execute_query.execute_sql_query(
-            generated_sql, self.settings
-        )
+        search_result = self.execute_query.execute_sql_query(generated_sql, self.settings)
         return search_result
 
 
@@ -93,9 +89,7 @@ class PolicyHandler(Handler):
         ]
 
         self.use_collections = (
-            self.collections
-            if self.collections
-            else find_matching_collections(user_input, available_collections)
+            self.collections if self.collections else find_matching_collections(user_input, available_collections)
         )
 
         for use_collection_name in self.use_collections:
@@ -104,9 +98,7 @@ class PolicyHandler(Handler):
     def handle(self, user_input: str) -> str:
         self.load_collections(user_input)
 
-        search_results = search(
-            user_input, self.loader.collections, self.use_collections, top_k=2
-        )
+        search_results = search(user_input, self.loader.collections, self.use_collections, top_k=2)
 
         answer = self.response_policy.generate_answer(user_input, search_results)
         return answer
@@ -114,19 +106,13 @@ class PolicyHandler(Handler):
 
 class HandlerFactory:
     @staticmethod
-    def get_handler(
-        intent: str, openai_client: OpenAI, template_manager: TemplateManager
-    ) -> Handler:
+    def get_handler(intent: str, openai_client: OpenAI, template_manager: TemplateManager) -> Handler:
         generate_sql_query = SQLGenerator(openai_client, template_manager)
         query_executor = QueryExecutor(openai_client, template_manager)
         collection_loader = CollectionLoader(settings.vector_path, UpstageEmbedding)
         response_policy = PolicyResponse(openai_client)
         if intent == IntentType.COMPARE_QUESTION:
-            return CompareHandler(
-                openai_client, template_manager, query_executor, generate_sql_query
-            )
+            return CompareHandler(openai_client, template_manager, query_executor, generate_sql_query)
         if intent == IntentType.POLICY_QUESTION:
-            return PolicyHandler(
-                openai_client, template_manager, collection_loader, response_policy
-            )
+            return PolicyHandler(openai_client, template_manager, collection_loader, response_policy)
         raise ValueError("올바른 intent type이 아닙니다.")

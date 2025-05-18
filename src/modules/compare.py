@@ -1,12 +1,12 @@
-from util.utils import process_query
+from openai import OpenAI
+
 from config.settings import Settings, settings
 from db.sql_utils import (
-    TemplateManager,
-    SQLGenerator,
     QueryExecutor,
+    SQLGenerator,
+    TemplateManager,
 )
-
-from openai import OpenAI
+from util.utils import process_query
 
 
 class CompareModule:
