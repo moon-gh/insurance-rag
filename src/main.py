@@ -4,8 +4,6 @@ from config.settings import PROJECT_ROOT, settings
 from db.sql_utils import TemplateManager
 from services.insurance_service import InsuranceService
 
-# TODO: isort setting precommit setting
-
 if __name__ == "__main__":
     print("\n=== 보험 상담 챗봇 ===")
 

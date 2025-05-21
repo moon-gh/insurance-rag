@@ -1,7 +1,8 @@
-src/insu_data
-study
-files
-poc/
+src/insu_data/*
+study/*
+poc/*
+files/*
+study/*
 .env
 src/models/vectorstore_for_test.py
 

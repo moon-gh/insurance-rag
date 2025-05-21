@@ -3,14 +3,14 @@ from abc import ABC, abstractmethod
 
 from openai import OpenAI
 
-from config.settings import Settings, settings
+from config.settings import UserState, settings, user_state
 from db.sql_utils import QueryExecutor, SQLGenerator, TemplateManager
 from models.collection_loader import CollectionLoader
 from models.embeddings import UpstageEmbedding
 from models.generate_answer import PolicyResponse
 from models.search import search
 from options.enums import IntentType, ModelType
-from util.utils import find_matching_collections, process_query
+from util.utils import QueryInfoExtract, find_matching_collections
 
 
 class Handler(ABC):
@@ -48,22 +48,23 @@ class CompareHandler(Handler):
         template_manager: TemplateManager,
         execute_query: QueryExecutor,
         sql_generator: SQLGenerator,
-        settings: Settings = settings,
+        user_state: UserState = user_state,
     ):
         super().__init__(openai_client, template_manager)
-        self.settings = settings
+        self.user_state = user_state
         self.sql_generator = sql_generator
         self.execute_query = execute_query
 
-    def print_settings(self, settings: Settings) -> None:
-        print(repr(settings))
+    def print_settings(self, user_state: UserState) -> None:
+        print(repr(user_state))
 
     def handle(self, user_input: str) -> str:
-        prompt, current_settings = process_query(user_input, self.settings)
-        self.settings = current_settings
-        generated_sql = self.sql_generator.generate(prompt, self.settings)
-        self.print_settings(self.settings)
-        search_result = self.execute_query.execute_sql_query(generated_sql, self.settings)
+        process_query = QueryInfoExtract(user_input, self.user_state)
+        prompt, curr_user_state = process_query.process()
+        self.user_state = curr_user_state
+        generated_sql = self.sql_generator.generate(prompt, self.user_state)
+        self.print_settings(self.user_state)
+        search_result = self.execute_query.execute_sql_query(generated_sql, self.user_state)
         return search_result
 
 
