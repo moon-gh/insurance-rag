@@ -4,6 +4,7 @@ poc/*
 files/*
 study/*
 .env
+.DS_Store
 src/models/vectorstore_for_test.py
 
 # Byte-compiled / optimized / DLL files
