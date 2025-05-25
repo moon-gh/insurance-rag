@@ -15,7 +15,7 @@ class QueryInfoExtract:
         if age_match:
             self.current_state.insu_age = int(age_match.group(1))
 
-    def extract_gender(self):
+    def extract_sex(self):
         if "남성" in self.prompt or "남자" in self.prompt:
             self.current_state.insu_sex = Sex.MALE
         elif "여성" in self.prompt or "여자" in self.prompt:

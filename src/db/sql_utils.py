@@ -121,14 +121,14 @@ class QueryExecutor:
         self.db_client = DatabaseClient()
         self.json_converter = JSONConverter(openai_client, template_manager)
 
-    def execute_sql_query(self, generated_sql: str, used_config: UserState) -> str:
+    def execute_sql_query(self, generated_sql: str, user_state: UserState) -> str:
         results = self.db_client.execute_query(generated_sql)
         print("\n[검색 결과]")
         if results:
             print(f"전체 결과 수: {len(results)}개")
             # 검색 결과와 설정값을 함께 딕셔너리로 구성
             temp_data = {
-                "설정값": asdict(used_config),
+                "설정값": asdict(user_state),
                 "쿼리": generated_sql,
                 "결과": results,  # 각 행은 이미 딕셔너리 형태임
             }
