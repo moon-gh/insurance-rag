@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from typing import Any
 
 import faiss
 from langchain.embeddings.base import Embeddings
@@ -12,7 +13,7 @@ class CollectionLoader:
     def __init__(self, vector_path: str, embeddings: Embeddings):
         self.base_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), vector_path)
         self.embeddings = embeddings
-        self.collections = []
+        self.collections: list[dict[str, Any]] = []
 
     @classmethod
     def load_local(
@@ -20,7 +21,7 @@ class CollectionLoader:
         folder_path: str,
         index_name: str = "faiss",
         index_extend: str = "index",
-    ) -> dict:
+    ) -> tuple[faiss.Index, dict[str, Any]]:
         if index_extend not in ["faiss", "index", "bin"]:
             raise ValueError("사용할 수 없는 파일 인덱스 확장자입니다.")
 
@@ -47,7 +48,7 @@ class CollectionLoader:
 
         return index, metadata
 
-    def load_collection(self, collection_name: str) -> bool:
+    def load_collection(self, collection_name: str) -> list[dict[str, Any]]:
         # 이미 로드된 컬렉션 확인
         for coll in self.collections:
             if coll["name"] == collection_name:
@@ -65,5 +66,4 @@ class CollectionLoader:
         )
 
         self.collections.append({"name": collection_name, "index": index, "metadata": metadata})
-
         return self.collections
