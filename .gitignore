@@ -2,7 +2,6 @@ src/insu_data/*
 study/*
 poc/*
 files/*
-study/*
 .env
 .DS_Store
 src/models/vectorstore_for_test.py

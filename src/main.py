@@ -2,6 +2,7 @@ from openai import OpenAI
 
 from config.settings import PROJECT_ROOT, settings
 from db.sql_utils import TemplateManager
+from modules.user_state import UserState
 from services.insurance_service import InsuranceService
 
 if __name__ == "__main__":
@@ -9,6 +10,9 @@ if __name__ == "__main__":
 
     template_manager = TemplateManager(templates_dir=PROJECT_ROOT / "prompts")
     openai_client = OpenAI(api_key=settings.openai_api_key)
+    user_state = UserState()
 
-    insurance_service = InsuranceService(openai_client=openai_client, template_manager=template_manager)
+    insurance_service = InsuranceService(
+        openai_client=openai_client, template_manager=template_manager, user_state=user_state
+    )
     insurance_service.run()

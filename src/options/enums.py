@@ -25,6 +25,18 @@ class ConversationFlow(StrEnum):
 
 class ModelType(StrEnum):
     INTENT_MODEL = "gpt-4-turbo"
+    KEYWORD_MODEL = "gpt-4o-2024-08-06"
+
+
+sex_mapping_table = {
+    Sex.MALE: "남자",
+    Sex.FEMALE: "여자",
+}
+
+product_type_mapping_table = {
+    ProductType.NON_REFUND: "무해지",
+    ProductType.REFUND: "해지환급",
+}
 
 
 CompanyName = str
