@@ -49,7 +49,7 @@ class FaissSearch:
             padded_embedding[0, :query_dim] = query_embedding[0, :]
             return padded_embedding
 
-        trimmed_embedding = query_embedding[0, :index_dim]
+        trimmed_embedding = query_embedding[0, :index_dim].reshape(1, -1)
         return trimmed_embedding
 
     def search_L2_index_by_query(
