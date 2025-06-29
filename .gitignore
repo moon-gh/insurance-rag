@@ -5,6 +5,8 @@ files/*
 .env
 .DS_Store
 src/models/vectorstore_for_test.py
+.chainlit
+chainlit.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
