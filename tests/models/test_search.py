@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from src.models.search import FaissSearch
+from models.search import FaissSearch
 
 
 class DummyIndex:

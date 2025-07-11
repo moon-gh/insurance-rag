@@ -28,6 +28,13 @@ class ModelType(StrEnum):
     KEYWORD_MODEL = "gpt-4o-2024-08-06"
 
 
+class ServiceEnv(StrEnum):
+    DEV = "DEV"
+    STG = "STG"
+    PROD = "PROD"
+    TEST = "TEST"
+
+
 sex_mapping_table = {
     Sex.MALE: "남자",
     Sex.FEMALE: "여자",
