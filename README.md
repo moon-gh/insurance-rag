@@ -15,34 +15,46 @@
 
 ```
 rag/
-├── poc/                            # 초기 레거시 코드
-├── src/                            # 소스 코드
-│   ├── config/                     # 설정 폴더
-│   │   └── settings.py
-│   ├── db/                         # DB 폴더
-│   │   ├── schema.py
-│   │   └── sql_utils.py
-│   ├── models/
-│   │   ├── collection_loader.py    # 콜렉션 로더 파일
-│   │   ├── generate_answer.py      # 답변 생성 파일
-│   │   ├── search.py               # 검색 파일
-│   │   └── embeddings.py           # 임베딩 파일
-│   ├── modules/
-│   │   └── handler.py              # 보험약관질의 모듈
-│   ├── options/
+├── poc/                               # 초기 레거시 코드
+├── src/                               # 소스 코드
+│   ├── config/                        # 설정 폴더
+│   │   ├── logger.py                  # 로깅 파일
+│   │   └── settings.py                # 설정 파일
+│   ├── db/                            # DB 폴더
+│   │   ├── schema.py                  # DB 스키마
+│   │   └── sql_utils.py               # SQL에 관한 유틸코드
+│   ├── models/                        # 보험약관질의모듈 관련 폴더
+│   │   ├── collection_loader.py       # 콜렉션 로더 파일
+│   │   ├── dict_types.py              # 딕셔너리 타입
+│   │   ├── generate_answer.py         # 답변 생성 파일
+│   │   ├── search.py                  # 검색 파일
+│   │   └── embeddings.py              # 임베딩 파일
+│   ├── modules/                       # 메인 모듈들 폴더
+│   │   ├── user_state.py              # 사용자 정보
+│   │   └── handler.py                 # 모듈들 파일
+│   ├── options/                       # 타입 폴더
+│   │   ├── insu_name.py
 │   │   └── enums.py
-│   ├── prompts/                    # 프롬프트 폴더
+│   ├── prompts/                       # 프롬프트 폴더
 │   │   ├── base_prompt.jinja2
 │   │   ├── example_prompt.jinja2
 │   │   └── intent_prompt.jinja2
-│   ├── tests/                      # 테스트 폴더
-│   ├── util/                       # 유틸리티 폴더
-│   │   └── utils.py                # 유틸리티 파일
-│   ├── insu_data/                  # 벡터 DB 저장소
+│   ├── services/                      # 서비스 폴더
+│   │   └── insurance_service.py       # 서비스 코드
+│   ├── util/                          # 유틸리티 폴더
+│   │   └── utils.py                   # 유틸리티 파일
+│   ├── insu_data/                     # 벡터 DB 저장소
 │   │   ├── Samsung_YakMu2404103NapHae20250113/
 │   │   ├── DBSonBo_YakMu20250123/
 │   │   └── ...
 │   └── main.py
+├── tests/                             # 테스트 폴더
+│   ├── models/                        # 보험약관질의모듈 관련 테스트폴더
+│   │   ├── test_search.py             # 검색 테스트
+│   │   ├── test_generate_answer.py    # 답변 생성 테스트
+│   │   ├── test_collection_loader.py  # 콜렉션 로더 테스트
+│   │   └── test_embeddings.py         # 임베딩 테스트
+│   └── db/
 ├── .gitignore
 ├── README.md
 └── requirements.txt
@@ -57,7 +69,7 @@ rag/
 ## Installation
 **1. Clone the repository**
 ```bash
-git clone https://github.com/sessac-multi-docu/rag.git
+git clone https://github.com/Insupanda/rag.git
 cd rag
 ```
 **2. Create a virtual environment**
@@ -73,11 +85,9 @@ pip install -r requirements.txt
 ```
 
 ## Settings
-다음 환경 변수를 설정해야 합니다:
+`.env`에 다음 환경 변수를 설정해야 합니다.
 - `OPENAI_API_KEY`: OpenAI API 키
 - `UPSTAGE_API_KEY`: Upstage API 키
-
-보험비교설계 데이터가 담긴 데이터베이스 환경설정
 - `db_password`: <데이터베이스 비밀번호>
 - `db_host`: <데이터베이스 호스트>
 - `db_port`: <데이터베이스 포트>
@@ -89,8 +99,14 @@ pip install -r requirements.txt
 RAG 모듈을 직접 실행하려면:
 
 ```bash
-cd /rag
-python src/main.py
+cd ./rag
+chainlit run src/main.py -w
+```
+
+## How to Test
+```bash
+cd ./rag
+CONF_ENV=TEST PYTHONPATH=$(pwd)/src pytest tests/
 ```
 
 ## Code Quality
@@ -100,6 +116,7 @@ pre-commit autoupdate # Automatically update to the latest packages.
 pre-commit install
 pre-commit run --all-files # check your code quality.
 ```
+
 ## CI (Continuous Integration) Pipeline
 Github Action의 super-liner로 구동. 모든 push와 main branch에 대한 PR(Pull Request)마다 검사를 자동적으로 실행
 - black (Checking format)
